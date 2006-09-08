@@ -44,6 +44,15 @@
 
 typedef unsigned char  uint8;
 typedef unsigned short uint16;
+typedef int            bool;
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
 
 #define PSPLASH_FIFO "psplash_fifo"
 
@@ -58,6 +67,18 @@ typedef unsigned short uint16;
 #else
 #define DBG(x, a...) do {} while (0)
 #endif
+
+typedef struct PSplashFont
+{
+    char *name;				/* Font name. */
+    int   height;			/* Height in pixels. */
+    int   index_mask;			/* ((1 << N) - 1). */
+    int  *offset;			/* (1 << N) offsets into index. */
+    int  *index;
+    u_int32_t *content;
+}
+PSplashFont;
+
 
 #include "psplash-fb.h"
 #include "psplash-console.h"

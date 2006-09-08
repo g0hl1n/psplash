@@ -129,7 +129,7 @@ psplash_fb_new (void)
   return NULL;
 }
 
-void
+inline void
 psplash_fb_plot_pixel (PSplashFB    *fb, 
 		       int          x, 
 		       int          y, 
@@ -178,10 +178,7 @@ psplash_fb_draw_rect (PSplashFB    *fb,
 
   for (dy=0; dy < height; dy++)   
     for (dx=0; dx < width; dx++)
-      {
-	/* FIXME: inline this call */
 	psplash_fb_plot_pixel (fb, x+dx, y+dy, red, green, blue); 
-      }
 }
 
 void
@@ -193,18 +190,9 @@ psplash_fb_draw_image (PSplashFB    *fb,
 		       int          img_bytes_per_pixel,
 		       uint8       *rle_data)
 {
-  uint8 *p = rle_data;
-  int    dx = 0, dy = 0,  total_len;
+  uint8       *p = rle_data;
+  int          dx = 0, dy = 0,  total_len;
   unsigned int len;
-
-#if 0
-  for (dy=0; dy < img_height; dy++)   
-    for (dx=0; dx < img_width; dx++)
-      {
-	psplash_fb_plot_pixel (fb, x+dx, y+dy, *p, *(p+1), *(p+2)); 
-	p += img_bytes_per_pixel;
-      }
-#endif
 
   total_len = img_width * img_height * img_bytes_per_pixel;
 
@@ -242,3 +230,111 @@ psplash_fb_draw_image (PSplashFB    *fb,
 	}
     }
 }
+
+/* Font rendering code based on BOGL by Ben Pfaff */
+
+static int
+psplash_font_glyph (const PSplashFont *font, wchar_t wc, u_int32_t **bitmap)
+{
+  int mask = font->index_mask;
+  int i;
+
+  for (;;)
+    {
+      for (i = font->offset[wc & mask]; font->index[i]; i += 2)
+	{
+	  if ((font->index[i] & ~mask) == (wc & ~mask))
+	    {
+	      if (bitmap != NULL)
+		*bitmap = &font->content[font->index[i+1]];
+	      return font->index[i] & mask;
+	    }
+	}
+    }
+  return 0;
+}
+
+void
+psplash_fb_text_size (PSplashFB          *fb,
+		      int                *width, 
+		      int                *height,
+		      const PSplashFont  *font,
+		      const char         *text)
+{
+  char   *c = (char*)text;
+  wchar_t wc;
+  int     k, n, w, h, mw;
+
+  n = strlen (text);
+  mw = h = w = 0;
+
+  mbtowc (0, 0, 0);
+  for (; (k = mbtowc (&wc, c, n)) > 0; c += k, n -= k)
+    {
+      if (*c == '\n')
+	{
+	  if (w > mw)
+	    mw = 0;
+	  h += font->height;
+	  continue;
+	}
+
+      w += psplash_font_glyph (font, wc, NULL);
+    }
+
+  *width  = (w > mw) ? w : mw;
+  *height = (h == 0) ? font->height : h;
+}
+
+void
+psplash_fb_draw_text (PSplashFB         *fb, 
+		      int                x, 
+		      int                y, 
+		      uint8              red,
+		      uint8              green,
+		      uint8              blue,
+		      const PSplashFont *font,
+		      const char        *text)
+{
+  int     h, w, k, n, cx, cy, dx, dy;
+  char   *c = (char*)text;
+  wchar_t wc;
+  
+  n = strlen (text);
+  h = font->height;
+  dx = dy = 0;
+   
+  mbtowc (0, 0, 0);
+  for (; (k = mbtowc (&wc, c, n)) > 0; c += k, n -= k)
+    {
+      u_int32_t *glyph = NULL;
+      
+      if (*c == '\n')
+	{
+	  dy += h;
+	  dx  = 0;
+	  continue;
+	}
+      
+      w = psplash_font_glyph (font, wc, &glyph);
+      
+      if (glyph == NULL)
+	continue;
+
+      for (cy = 0; cy < h; cy++)
+	{
+	  u_int32_t g = *glyph++;
+	  
+	  for (cx = 0; cx < w; cx++)
+	    {
+	      if (g & 0x80000000)
+		psplash_fb_plot_pixel (fb, x+dx+cx, y+dy+cy, 
+				       red, green, blue); 
+	      g <<= 1;
+	    }
+	}
+
+      dx += w;
+    }
+}
+

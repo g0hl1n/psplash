@@ -1,0 +1,15 @@
+2006-09-08  Matthew Allum  <mallum@openedhand.com>
+
+	* Makefile.am:
+	* radeon-font.h:
+	Add 'compiled' font.
+
+	* psplash-fb.c:
+	* psplash-fb.h:
+	* psplash.c:
+	* psplash.h:
+	Add basic font/text rendering support 
+	Add remote msg suuport (psplash-write 'MSG hello world')
+	Add cmd line switch to disable console switch
+	Move console switch after fifo set up.
+

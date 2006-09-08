@@ -39,7 +39,7 @@ psplash_fb_destroy (PSplashFB *fb);
 PSplashFB*
 psplash_fb_new (void);
 
-void
+inline void
 psplash_fb_plot_pixel (PSplashFB    *fb, 
 		       int          x, 
 		       int          y, 
@@ -65,5 +65,23 @@ psplash_fb_draw_image (PSplashFB    *fb,
 		       int          img_height,
 		       int          img_bytes_pre_pixel,
 		       uint8       *rle_data);
+
+void
+psplash_fb_text_size (PSplashFB          *fb,
+		      int                *width, 
+		      int                *height,
+		      const PSplashFont  *font,
+		      const char         *text);
+
+void
+psplash_fb_draw_text (PSplashFB         *fb, 
+		      int                x, 
+		      int                y, 
+		      uint8              red,
+		      uint8              green,
+		      uint8              blue,
+		      const PSplashFont *font,
+		      const char        *text);
+
 
 #endif

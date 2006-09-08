@@ -20,6 +20,9 @@
 
 #include "psplash.h"
 #include "psplash-image.h"
+#include "radeon-font.h"
+
+#define MSG "Poky is starting up.."
 
 void
 psplash_exit (int signum)
@@ -27,6 +30,34 @@ psplash_exit (int signum)
   DBG("mark");
 
   psplash_console_reset ();
+}
+
+void
+psplash_draw_msg (PSplashFB *fb, const char *msg)
+{
+  int w, h;
+
+  psplash_fb_text_size (fb, &w, &h, &radeon_font, msg);
+
+  DBG("displaying '%s' %ix%i\n", msg, w, h) 
+
+  /* Clear */
+
+  psplash_fb_draw_rect (fb, 
+			0, 
+			fb->height - (fb->height/6) - h, 
+			fb->width,
+			h,
+			0xff, 0xff, 0xff);
+
+  psplash_fb_draw_text (fb,
+			(fb->width-w)/2, 
+			fb->height - (fb->height/6) - h,
+			0x44,
+			0x44,
+			0x44,
+			&radeon_font,
+			msg);
 }
 
 void
@@ -65,44 +96,13 @@ parse_command (PSplashFB *fb, char *string, int length)
 
   command = strtok(string," ");
 
-  if (!strcmp(command,"TEXT")) 
-    {
-      char *line   = strtok(NULL,"\0");
-      int   length = strlen(line);		
-
-      while (length>50) 
-	{
-	  // draw_text(line,50);
-	  line+=50;
-	  length-=50;
-	}
-
-      // draw_text(line,length);
-    } 
-  else if (!strcmp(command,"STATUS")) 
-    {
-      // draw_status(strtok(NULL,"\0"),0);
-    } 
-  else if (!strcmp(command,"SUCCESS")) 
-    {
-      // draw_status(strtok(NULL,"\0"),TEXT_FOREGROUND);
-    } 
-  else if (!strcmp(command,"FAILURE")) 
-    {
-      // draw_status(strtok(NULL,"\0"),RED);
-    } 
-  else if (!strcmp(command,"PROGRESS")) 
+  if (!strcmp(command,"PROGRESS")) 
     {
       psplash_draw_progress (fb, atoi(strtok(NULL,"\0")));
-      // draw_progress(atoi(strtok(NULL,"\0")));
     } 
-  else if (!strcmp(command,"CLEAR")) 
+  else if (!strcmp(command,"MSG")) 
     {
-      // text_clear();
-    } 
-  else if (!strcmp(command,"TIMEOUT")) 
-    {
-      // timeout=(atoi(strtok(NULL,"\0")));
+      psplash_draw_msg (fb, strtok(NULL,"\0"));
     } 
   else if (!strcmp(command,"QUIT")) 
     {
@@ -179,14 +179,24 @@ int
 main (int argc, char** argv) 
 {
   char      *tmpdir;
-  int        pipe_fd;
+  int        pipe_fd, i = 0;
   PSplashFB *fb;
-
+  bool       disable_console_switch = FALSE;
+  
   signal(SIGHUP, psplash_exit);
   signal(SIGINT, psplash_exit);
   signal(SIGQUIT, psplash_exit);
 
-  psplash_console_switch ();
+  while (++i < argc)
+    {
+      if (!strcmp(argv[i],"-n") || !strcmp(argv[i],"--no-console-switch"))
+        {
+	  disable_console_switch = TRUE;
+	  continue;
+	}
+      fprintf(stderr, "Usage: %s [-n|--no-console-switch]\n", argv[0]);
+      exit(-1);
+    }
 
   tmpdir = getenv("TMPDIR");
 
@@ -212,10 +222,11 @@ main (int argc, char** argv)
       exit(-2);
     }
 
+  if (!disable_console_switch)
+    psplash_console_switch ();
+
   if ((fb = psplash_fb_new()) == NULL)
     exit(-1);
-
-  DBG("rect to %ix%i", fb->width, fb->height);
 
   psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height, 0xff, 0xff, 0xff);
 
@@ -227,11 +238,15 @@ main (int argc, char** argv)
 			 IMG_BYTES_PER_PIXEL,
 			 IMG_RLE_PIXEL_DATA);
 
-  psplash_draw_progress (fb, 50);
+
+  psplash_draw_progress (fb, 0);
+
+  psplash_draw_msg (fb, MSG);
 
   psplash_main (fb, pipe_fd, 0);
 
-  psplash_console_reset ();
+  if (!disable_console_switch)
+    psplash_console_reset ();
 
   psplash_fb_destroy (fb);
 
