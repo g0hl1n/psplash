@@ -3,8 +3,8 @@ bin_PROGRAMS=psplash psplash-write
 AM_CFLAGS = $(GCC_FLAGS) -D_GNU_SOURCE
 
 psplash_SOURCES = psplash.c psplash.h psplash-fb.c psplash-fb.h \
-                  psplash-console.c psplash-console.h psplash-image.h \
-		  radeon-font.h
+                  psplash-console.c psplash-console.h           \
+		  psplash-hand-img.h psplash-bar-img.h radeon-font.h
 
 psplash_write_SOURCES = psplash-write.c psplash.h
 

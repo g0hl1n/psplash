@@ -19,10 +19,11 @@
  */
 
 #include "psplash.h"
-#include "psplash-image.h"
+#include "psplash-hand-img.h"
+#include "psplash-bar-img.h"
 #include "radeon-font.h"
 
-#define MSG "Poky is starting up.."
+#define MSG ""
 
 void
 psplash_exit (int signum)
@@ -48,14 +49,12 @@ psplash_draw_msg (PSplashFB *fb, const char *msg)
 			fb->height - (fb->height/6) - h, 
 			fb->width,
 			h,
-			0xff, 0xff, 0xff);
+			0xec, 0xec, 0xe1);
 
   psplash_fb_draw_text (fb,
 			(fb->width-w)/2, 
 			fb->height - (fb->height/6) - h,
-			0x44,
-			0x44,
-			0x44,
+			0x6d, 0x6d, 0x70,
 			&radeon_font,
 			msg);
 }
@@ -65,20 +64,20 @@ psplash_draw_progress (PSplashFB *fb, int value)
 {
   int x, y, width, height;
 
-  x      = fb->width/8;
-  y      = fb->height - (fb->height/8); 
-  width  = fb->width - (fb->width/4);
-  height = 16;
+  /* 4 pix border */
+  x      = ((fb->width  - BAR_IMG_WIDTH)/2) + 4 ;
+  y      = fb->height - (fb->height/8) + 4;
+  width  = BAR_IMG_WIDTH - 8; 
+  height = BAR_IMG_WIDTH - 8;
 
   value = CLAMP(value,0,100);
 
   DBG("total w: %i, val :%i, w: %i", 
       width, value, (value * width) / 100);
 
-  psplash_fb_draw_rect (fb, x, y, width, height, 0xce, 0xce, 0xce);
   psplash_fb_draw_rect (fb, x, y, 
 			(value * width) / 100, 
-			height, 0x5b, 0x8a, 0xb2);
+			height, 0x6d, 0x6d, 0x70);
 }
 
 static int 
@@ -228,15 +227,23 @@ main (int argc, char** argv)
   if ((fb = psplash_fb_new()) == NULL)
     exit(-1);
 
-  psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height, 0xff, 0xff, 0xff);
+  psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height, 0xec, 0xec, 0xe1);
 
   psplash_fb_draw_image (fb, 
-			 (fb->width  - IMG_WIDTH)/2, 
-			 (fb->height - IMG_HEIGHT)/4, 
-			 IMG_WIDTH,
-			 IMG_HEIGHT,
-			 IMG_BYTES_PER_PIXEL,
-			 IMG_RLE_PIXEL_DATA);
+			 (fb->width  - HAND_IMG_WIDTH)/2, 
+			 (fb->height - HAND_IMG_HEIGHT)/4, 
+			 HAND_IMG_WIDTH,
+			 HAND_IMG_HEIGHT,
+			 HAND_IMG_BYTES_PER_PIXEL,
+			 HAND_IMG_RLE_PIXEL_DATA);
+
+  psplash_fb_draw_image (fb, 
+			 (fb->width  - BAR_IMG_WIDTH)/2, 
+			 fb->height - (fb->height/8), 
+			 BAR_IMG_WIDTH,
+			 BAR_IMG_HEIGHT,
+			 BAR_IMG_BYTES_PER_PIXEL,
+			 BAR_IMG_RLE_PIXEL_DATA);
 
 
   psplash_draw_progress (fb, 0);

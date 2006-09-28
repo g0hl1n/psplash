@@ -1,3 +1,15 @@
+2006-09-28  Matthew Allum  <mallum@openedhand.com>
+
+	* Makefile.am:
+	* make-image-header.sh:
+	* psplash-bar-img.h:
+	* psplash-hand-img.h:
+	* psplash.c: (psplash_draw_msg), (psplash_draw_progress), (main):
+	Add new hopefully nicer untested images.
+	
+	* psplash-image.h:
+	Remove
+
 2006-09-08  Matthew Allum  <mallum@openedhand.com>
 
 	* Makefile.am:
