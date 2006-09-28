@@ -1,5 +1,10 @@
 2006-09-28  Matthew Allum  <mallum@openedhand.com>
 
+	* psplash.c: (psplash_draw_progress), (main):
+	img positioning tweaks.
+
+2006-09-28  Matthew Allum  <mallum@openedhand.com>
+
 	* Makefile.am:
 	* make-image-header.sh:
 	* psplash-bar-img.h:

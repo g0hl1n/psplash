@@ -68,7 +68,7 @@ psplash_draw_progress (PSplashFB *fb, int value)
   x      = ((fb->width  - BAR_IMG_WIDTH)/2) + 4 ;
   y      = fb->height - (fb->height/8) + 4;
   width  = BAR_IMG_WIDTH - 8; 
-  height = BAR_IMG_WIDTH - 8;
+  height = BAR_IMG_HEIGHT - 8;
 
   value = CLAMP(value,0,100);
 
@@ -231,7 +231,7 @@ main (int argc, char** argv)
 
   psplash_fb_draw_image (fb, 
 			 (fb->width  - HAND_IMG_WIDTH)/2, 
-			 (fb->height - HAND_IMG_HEIGHT)/4, 
+			 (fb->height - HAND_IMG_HEIGHT)/2, 
 			 HAND_IMG_WIDTH,
 			 HAND_IMG_HEIGHT,
 			 HAND_IMG_BYTES_PER_PIXEL,
