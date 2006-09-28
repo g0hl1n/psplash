@@ -1,5 +1,12 @@
 2006-09-28  Matthew Allum  <mallum@openedhand.com>
 
+	* psplash-bar-img.h:
+	pixel pop a little
+	* psplash.c: (psplash_draw_progress), (main):
+	Move bar up a little.
+
+2006-09-28  Matthew Allum  <mallum@openedhand.com>
+
 	* psplash.c: (psplash_draw_progress), (main):
 	img positioning tweaks.
 
