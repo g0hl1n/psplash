@@ -1,3 +1,10 @@
+2006-11-21  Matthew Allum  <mallum@openedhand.com>
+
+	* psplash.c: (main):
+	Add some more commenting
+	* psplash.doap:
+	Add DOAP file.
+
 2006-09-28  Matthew Allum  <mallum@openedhand.com>
 
 	* psplash-bar-img.h:

@@ -1,0 +1,45 @@
+<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns="http://usefulinc.com/ns/doap#">
+
+	<name>PSplash</name>
+	<created>2006-21-11</created>
+
+	<shortdesc xml:lang="en">PSplash is a graphcial boot screen</shortdesc>
+
+	<description xml:lang="en"> 
+
+	PSplash is a userspace graphical boot splash screen for mainly
+	embedded devices supporting a 16bpp framebuffer. It also
+	includes a 'client' command utility for sending information to
+	psplash such as boot progress information.
+
+	</description>
+
+	<license rdf:resource="http://usefulinc.com/doap/licenses/gpl" />
+        <bug-database rdf:resource="http://bugzilla.o-hand.com/enter_bug.cgi?product=psplash"/>
+        <os>linux</os>
+        <programming-language>C</programming-language>
+        <category rdf:resource="http://labs.o-hand.com/doap/category/system"/>
+        <category rdf:resource="http://labs.o-hand.com/doap/category/graphics"/>
+
+	<maintainer>
+		<foaf:Person>
+			<foaf:name>Matthew Allum</foaf:name>
+		</foaf:Person>
+	</maintainer>
+
+	<author>
+		<foaf:Person>
+			<foaf:name>Matthew Allum</foaf:name>
+		</foaf:Person>
+	</author>
+
+        <repository>
+		<SVNRepository>
+			<browse rdf:resource="http://svn.o-hand.com/view/misc/trunk/psplash"/>
+			<location rdf:resource="https://svn.o-hand.com/repos/misc/trunk/psplash"/>
+		</SVNRepository>
+        </repository>
+
+</Project>

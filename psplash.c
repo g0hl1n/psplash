@@ -227,8 +227,10 @@ main (int argc, char** argv)
   if ((fb = psplash_fb_new()) == NULL)
     exit(-1);
 
+  /* Clear the background with #ecece1 */
   psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height, 0xec, 0xec, 0xe1);
 
+  /* Draw the OH logo  */
   psplash_fb_draw_image (fb, 
 			 (fb->width  - HAND_IMG_WIDTH)/2, 
 			 (fb->height - HAND_IMG_HEIGHT)/2, 
@@ -237,6 +239,7 @@ main (int argc, char** argv)
 			 HAND_IMG_BYTES_PER_PIXEL,
 			 HAND_IMG_RLE_PIXEL_DATA);
 
+  /* Draw progress bar border */
   psplash_fb_draw_image (fb, 
 			 (fb->width  - BAR_IMG_WIDTH)/2, 
 			 fb->height - (fb->height/6), 
