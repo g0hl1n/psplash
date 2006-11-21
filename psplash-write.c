@@ -47,7 +47,9 @@ int main(int argc, char **argv)
   
   if ((pipe_fd = open (PSPLASH_FIFO,O_WRONLY|O_NONBLOCK)) == -1)
     {
-      perror("Error unable to open fifo");
+      /* Silently error out instead of covering the boot process in 
+         errors when psplash has exitted due to a VC switch */
+      /* perror("Error unable to open fifo"); */
       exit (-1);
     }
 

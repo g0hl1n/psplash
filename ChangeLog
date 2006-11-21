@@ -1,3 +1,8 @@
+2006-11-21  Richard Purdie  <rpurdie@openedhand.com>
+
+	* psplash-write.c:
+	Disable error message when the fifo doesn't exist.
+
 2006-11-21  Matthew Allum  <mallum@openedhand.com>
 
 	* psplash.c: (main):
