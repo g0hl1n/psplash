@@ -1,3 +1,12 @@
+2006-12-19  Matthew Allum  <mallum@openedhand.com>
+
+	* psplash-fb.c:
+	* psplash-fb.h:
+	* psplash.c:
+	Add some as yet tested basic rotation code.
+	* psplash.h:
+	Disable DBG output by default.
+
 2006-11-21  Richard Purdie  <rpurdie@openedhand.com>
 
 	* psplash-write.c:

@@ -69,8 +69,8 @@ psplash_fb_new (void)
 	      fb_var.bits_per_pixel);
     }
 
-  fb->width  = fb_var.xres;
-  fb->height = fb_var.yres;
+  fb->real_width  = fb->width  = fb_var.xres;
+  fb->real_height = fb->height = fb_var.yres;
   fb->bpp    = fb_var.bits_per_pixel;
   fb->stride = fb_fix.line_length;
   fb->type   = fb_fix.type;
@@ -78,7 +78,6 @@ psplash_fb_new (void)
 
   DBG("width: %i, height: %i, bpp: %i, stride: %i", 
       fb->width, fb->height, fb->bpp, fb->stride);
-
 
   fb->base = (char *) mmap ((caddr_t) NULL,
 			    /*fb_fix.smem_len */
@@ -119,6 +118,19 @@ psplash_fb_new (void)
   status = 2;
 #endif
 
+  switch (fb->angle)
+    {
+    case 270:
+    case 90:
+      fb->width  = fb->real_height;
+      fb->height = fb->real_width;
+      break;
+    case 180:
+    case 0:
+    default:
+      break;
+    }
+
   return fb;
 
  fail:
@@ -139,10 +151,24 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
 {
   int off;
 
-  if (x < 0 || x > fb->width-1 || y < 0 || y > fb->height-1)
-    return;
-
-  off = (y * fb->stride) + (x * (fb->bpp >> 3));
+  switch (fb->angle)
+    {
+    case 270:
+      off = ((fb->width - x) * fb->stride) + (y * (fb->bpp >> 3));
+      break;
+    case 180:
+      off = ((fb->height - y) * fb->stride) + ((fb->width - x) * (fb->bpp >> 3));
+      break;
+    case 90:
+      off = (x * fb->stride) + (y * (fb->bpp >> 3));
+      break;
+    case 0:
+    default:
+      if (x < 0 || x > fb->width-1 || y < 0 || y > fb->height-1)
+	return;
+      off = (y * fb->stride) + (x * (fb->bpp >> 3));
+      break;
+    }
 
   /* FIXME: handle no RGB orderings */
   switch (fb->bpp)

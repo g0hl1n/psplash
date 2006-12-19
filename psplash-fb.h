@@ -30,6 +30,8 @@ typedef struct PSplashFB
   char		*data;
   char		*base;
 
+  int            angle;
+  int            real_width, real_height;
 }
 PSplashFB;
 

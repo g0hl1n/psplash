@@ -40,7 +40,7 @@ psplash_draw_msg (PSplashFB *fb, const char *msg)
 
   psplash_fb_text_size (fb, &w, &h, &radeon_font, msg);
 
-  DBG("displaying '%s' %ix%i\n", msg, w, h) 
+  DBG("displaying '%s' %ix%i\n", msg, w, h);
 
   /* Clear */
 
@@ -247,7 +247,6 @@ main (int argc, char** argv)
 			 BAR_IMG_HEIGHT,
 			 BAR_IMG_BYTES_PER_PIXEL,
 			 BAR_IMG_RLE_PIXEL_DATA);
-
 
   psplash_draw_progress (fb, 0);
 

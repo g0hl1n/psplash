@@ -59,7 +59,7 @@ typedef int            bool;
 #define CLAMP(x, low, high) \
    (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG
 #define DBG(x, a...) \
