@@ -203,7 +203,7 @@ main (int argc, char** argv)
       
     fail:
       fprintf(stderr, 
-	      "Usage: %s [-n|--no-console-switch] [-a|--angle <0|90|180|270>]\n", 
+	      "Usage: %s [-n|--no-console-switch][-a|--angle <0|90|180|270>]\n", 
 	      argv[0]);
       exit(-1);
     }
