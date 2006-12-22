@@ -26,7 +26,7 @@ psplash_fb_destroy (PSplashFB *fb)
 }
 
 PSplashFB*
-psplash_fb_new (void)
+psplash_fb_new (int angle)
 {
   struct fb_var_screeninfo fb_var;
   struct fb_fix_screeninfo fb_fix;
@@ -118,6 +118,8 @@ psplash_fb_new (void)
   status = 2;
 #endif
 
+  fb->angle = angle;
+
   switch (fb->angle)
     {
     case 270:
@@ -141,6 +143,8 @@ psplash_fb_new (void)
   return NULL;
 }
 
+#define OFFSET(fb,x,y) (((y) * (fb)->stride) + ((x) * ((fb)->bpp >> 3)))
+
 inline void
 psplash_fb_plot_pixel (PSplashFB    *fb, 
 		       int          x, 
@@ -151,22 +155,23 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
 {
   int off;
 
+  if (x < 0 || x > fb->width-1 || y < 0 || y > fb->height-1)
+    return;
+
   switch (fb->angle)
     {
     case 270:
-      off = ((fb->width - x) * fb->stride) + (y * (fb->bpp >> 3));
+      off = OFFSET (fb, fb->real_height - y - 1, x);
       break;
     case 180:
-      off = ((fb->height - y) * fb->stride) + ((fb->width - x) * (fb->bpp >> 3));
+      off = OFFSET (fb, fb->real_width - x - 1, fb->real_height - y - 1);
       break;
     case 90:
-      off = (x * fb->stride) + (y * (fb->bpp >> 3));
+      off = OFFSET (fb, y, fb->real_width - x - 1);
       break;
     case 0:
     default:
-      if (x < 0 || x > fb->width-1 || y < 0 || y > fb->height-1)
-	return;
-      off = (y * fb->stride) + (x * (fb->bpp >> 3));
+      off = OFFSET (fb, x, y);
       break;
     }
 

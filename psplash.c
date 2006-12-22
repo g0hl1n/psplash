@@ -178,7 +178,7 @@ int
 main (int argc, char** argv) 
 {
   char      *tmpdir;
-  int        pipe_fd, i = 0;
+  int        pipe_fd, i = 0, angle = 0;
   PSplashFB *fb;
   bool       disable_console_switch = FALSE;
   
@@ -193,7 +193,16 @@ main (int argc, char** argv)
 	  disable_console_switch = TRUE;
 	  continue;
 	}
-      fprintf(stderr, "Usage: %s [-n|--no-console-switch]\n", argv[0]);
+
+      if (!strcmp(argv[i],"-a") || !strcmp(argv[i],"--angle"))
+        {
+	  if (++i > argc) goto fail;
+	  angle = atoi(argv[0]);
+	  continue;
+	}
+      
+    fail:
+      fprintf(stderr, "Usage: %s [-n|--no-console-switch] [-a|--angle <0|90|180|270>]\n", argv[0]);
       exit(-1);
     }
 
@@ -224,7 +233,7 @@ main (int argc, char** argv)
   if (!disable_console_switch)
     psplash_console_switch ();
 
-  if ((fb = psplash_fb_new()) == NULL)
+  if ((fb = psplash_fb_new(angle)) == NULL)
     exit(-1);
 
   /* Clear the background with #ecece1 */

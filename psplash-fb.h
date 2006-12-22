@@ -39,7 +39,7 @@ void
 psplash_fb_destroy (PSplashFB *fb);
 
 PSplashFB*
-psplash_fb_new (void);
+psplash_fb_new (int angle);
 
 inline void
 psplash_fb_plot_pixel (PSplashFB    *fb, 
