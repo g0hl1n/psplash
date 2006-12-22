@@ -1,5 +1,10 @@
 2006-12-22  Matthew Allum  <mallum@openedhand.com>
 
+	* psplash.c:
+	Whoops, actually set the angle config option
+
+2006-12-22  Matthew Allum  <mallum@openedhand.com>
+
 	* psplash-fb.c:
 	* psplash-fb.h:
 	* psplash.c:

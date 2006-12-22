@@ -197,12 +197,14 @@ main (int argc, char** argv)
       if (!strcmp(argv[i],"-a") || !strcmp(argv[i],"--angle"))
         {
 	  if (++i > argc) goto fail;
-	  angle = atoi(argv[0]);
+	  angle = atoi(argv[i]);
 	  continue;
 	}
       
     fail:
-      fprintf(stderr, "Usage: %s [-n|--no-console-switch] [-a|--angle <0|90|180|270>]\n", argv[0]);
+      fprintf(stderr, 
+	      "Usage: %s [-n|--no-console-switch] [-a|--angle <0|90|180|270>]\n", 
+	      argv[0]);
       exit(-1);
     }
 
