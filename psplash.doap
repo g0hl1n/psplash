@@ -5,15 +5,17 @@
 	<name>PSplash</name>
 	<created>2006-21-11</created>
 
-	<shortdesc xml:lang="en">PSplash is a graphcial boot screen</shortdesc>
+	<shortdesc xml:lang="en">PSplash is a graphical boot screen</shortdesc>
 
 	<description xml:lang="en"> 
-
 	PSplash is a userspace graphical boot splash screen for mainly
-	embedded devices supporting a 16bpp framebuffer. It also
-	includes a 'client' command utility for sending information to
-	psplash such as boot progress information.
+	embedded Linux devices supporting a 16bpp or 32bpp
+	framebuffer. It has few dependencies (just libc), supports
+	basic images and text, handles rotation and its visual look is
+	configurable by basic source changes.
 
+	Also included is a 'client' command utility for sending
+	information to psplash such as boot progress information.
 	</description>
 
 	<license rdf:resource="http://usefulinc.com/doap/licenses/gpl" />

@@ -1,5 +1,5 @@
 AC_PREREQ(2.53)
-AC_INIT(psplash, 0.0, [http://bugzilla.o-hand.com/enter_bug.cgi?product=psplash])
+AC_INIT(psplash, 0.1, [http://bugzilla.o-hand.com/enter_bug.cgi?product=psplash])
 AM_INIT_AUTOMAKE()
 AC_CONFIG_SRCDIR(psplash.c)
 AM_CONFIG_HEADER(config.h)

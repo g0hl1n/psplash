@@ -1,3 +1,10 @@
+2007-02-16  Matthew Allum  <mallum@openedhand.com>
+
+	* README:
+	* configure.ac:
+	* psplash.doap:
+	Update for 0.1 release
+
 2006-12-22  Matthew Allum  <mallum@openedhand.com>
 
 	* psplash-fb.c:
