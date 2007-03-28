@@ -62,7 +62,7 @@ psplash_draw_msg (PSplashFB *fb, const char *msg)
 void
 psplash_draw_progress (PSplashFB *fb, int value)
 {
-  int x, y, width, height;
+  int x, y, width, height, barwidth;
 
   /* 4 pix border */
   x      = ((fb->width  - BAR_IMG_WIDTH)/2) + 4 ;
@@ -70,14 +70,26 @@ psplash_draw_progress (PSplashFB *fb, int value)
   width  = BAR_IMG_WIDTH - 8; 
   height = BAR_IMG_HEIGHT - 8;
 
-  value = CLAMP(value,0,100);
+  /* clear */
+  psplash_fb_draw_rect (fb, x, y, width, height,
+			0xec, 0xec, 0xe1);
 
-  DBG("total w: %i, val :%i, w: %i", 
-      width, value, (value * width) / 100);
+  if (value > 0)
+    {
+      barwidth = (CLAMP(value,0,100) * width) / 100;
+      psplash_fb_draw_rect (fb, x, y, barwidth,
+			    height, 0x6d, 0x6d, 0x70);
+    }
+  else
+    {
+      barwidth = (CLAMP(-value,0,100) * width) / 100;
+      psplash_fb_draw_rect (fb, x + width - barwidth,
+			    y, barwidth, height,
+			    0x6d, 0x6d, 0x70);
+    }
 
-  psplash_fb_draw_rect (fb, x, y, 
-			(value * width) / 100, 
-			height, 0x6d, 0x6d, 0x70);
+  DBG("value: %i, width: %i, barwidth :%i\n", value, 
+		width, barwidth);
 }
 
 static int 
