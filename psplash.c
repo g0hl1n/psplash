@@ -70,19 +70,21 @@ psplash_draw_progress (PSplashFB *fb, int value)
   width  = BAR_IMG_WIDTH - 8; 
   height = BAR_IMG_HEIGHT - 8;
 
-  /* clear */
-  psplash_fb_draw_rect (fb, x, y, width, height,
-			0xec, 0xec, 0xe1);
-
   if (value > 0)
     {
       barwidth = (CLAMP(value,0,100) * width) / 100;
+      psplash_fb_draw_rect (fb, x + barwidth, y, 
+    			width - barwidth, height,
+			0xec, 0xec, 0xe1);
       psplash_fb_draw_rect (fb, x, y, barwidth,
 			    height, 0x6d, 0x6d, 0x70);
     }
   else
     {
       barwidth = (CLAMP(-value,0,100) * width) / 100;
+      psplash_fb_draw_rect (fb, x, y, 
+    			width - barwidth, height,
+			0xec, 0xec, 0xe1);
       psplash_fb_draw_rect (fb, x + width - barwidth,
 			    y, barwidth, height,
 			    0x6d, 0x6d, 0x70);
