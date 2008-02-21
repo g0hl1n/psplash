@@ -1,5 +1,10 @@
 2008-02-21  Rob Bradford  <rob@openedhand.com>
 
+	* psplash.c: (main):
+	Revert artwork. Needs more love.
+
+2008-02-21  Rob Bradford  <rob@openedhand.com>
+
 	* psplash-poky-img.h:
 	* psplash.c: (main):
 	Try new artwork.
