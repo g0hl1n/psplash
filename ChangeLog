@@ -1,3 +1,9 @@
+2008-02-21  Rob Bradford  <rob@openedhand.com>
+
+	* psplash-poky-img.h:
+	* psplash.c: (main):
+	Try new artwork.
+
 2007-03-28  Richard Purdie  <rpurdie@openedhand.com>
 
 	* psplash.c:
