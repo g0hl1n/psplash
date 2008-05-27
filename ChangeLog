@@ -1,3 +1,9 @@
+2008-05-27  Robert Bragg  <bob@openedhand.com>
+	
+	* psplash-fb.c:
+	Added support for attempting to configure a 32/16bpp fbdev pixel
+	format, if the default (e.g. 8bpp) is not supported.
+
 2008-02-21  Rob Bradford  <rob@openedhand.com>
 
 	* psplash.c: (main):
