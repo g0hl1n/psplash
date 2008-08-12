@@ -175,6 +175,15 @@ psplash_main (PSplashFB *fb, int pipe_fd, int timeout)
 	    return;
 	  length = 0;
 	} 
+      else if (command[length-1] == '\n') 
+	{
+	  command[length-1] = '\0';
+	  if (parse_command(fb, command, strlen(command))) 
+	    return;
+	  length = 0;
+	} 
+
+
     out:
       end = &command[length];
     
