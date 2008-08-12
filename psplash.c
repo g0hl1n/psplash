@@ -288,6 +288,8 @@ main (int argc, char** argv)
 
   psplash_main (fb, pipe_fd, 0);
 
+  unlink(PSPLASH_FIFO);
+
   if (!disable_console_switch)
     psplash_console_reset ();
 

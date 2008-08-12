@@ -1,6 +1,11 @@
 2008-08-12  Richard Purdie  <rpurdie@openedhand.com>
 
 	* psplash.c:
+	Unlink the fifo when exitting.
+
+2008-08-12  Richard Purdie  <rpurdie@openedhand.com>
+
+	* psplash.c:
 	Allow newline terminated commands as well as null terminated ones 
 	through the fifo.
 
