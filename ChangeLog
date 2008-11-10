@@ -1,3 +1,9 @@
+2008-08-12  Samuel Ortiz  <sameo@linux.intel.com>
+
+	* psplash.c:
+	unlink the FIFO and switch the console back when no fb is found.
+
+
 2008-08-12  Richard Purdie  <rpurdie@openedhand.com>
 
 	* psplash.c:
