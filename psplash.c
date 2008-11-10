@@ -201,7 +201,7 @@ int
 main (int argc, char** argv) 
 {
   char      *tmpdir;
-  int        pipe_fd, i = 0, angle = 0;
+  int        pipe_fd, i = 0, angle = 0, ret = 0;
   PSplashFB *fb;
   bool       disable_console_switch = FALSE;
   
@@ -258,8 +258,10 @@ main (int argc, char** argv)
   if (!disable_console_switch)
     psplash_console_switch ();
 
-  if ((fb = psplash_fb_new(angle)) == NULL)
-    exit(-1);
+  if ((fb = psplash_fb_new(angle)) == NULL) {
+	  ret = -1;
+	  goto fb_fail;
+  }
 
   /* Clear the background with #ecece1 */
   psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height, 0xec, 0xec, 0xe1);
@@ -288,12 +290,14 @@ main (int argc, char** argv)
 
   psplash_main (fb, pipe_fd, 0);
 
+
+  psplash_fb_destroy (fb);
+
+ fb_fail:
   unlink(PSPLASH_FIFO);
 
   if (!disable_console_switch)
     psplash_console_reset ();
 
-  psplash_fb_destroy (fb);
-
-  return 0;
+  return ret;
 }
