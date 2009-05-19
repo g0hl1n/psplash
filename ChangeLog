@@ -1,3 +1,14 @@
+2009-05-19  Richard Purdie <rpurdie@linux.intel.com>
+
+	* psplash-fb.c:
+	* psplash-poky-img.h:
+	* psplash.c
+	* Makefile.am:
+	Fix colour read order from RLE images (R & B swapped)
+	Add handling for alpha channel in images
+	Update the Poky RLE image
+	Change the OpenedHand logo for the Poky one
+
 2008-11-10  Samuel Ortiz  <sameo@linux.intel.com>
 
 	* psplash.c:

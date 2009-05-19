@@ -19,7 +19,7 @@
  */
 
 #include "psplash.h"
-#include "psplash-hand-img.h"
+#include "psplash-poky-img.h"
 #include "psplash-bar-img.h"
 #include "radeon-font.h"
 
@@ -268,12 +268,12 @@ main (int argc, char** argv)
 
   /* Draw the OH logo  */
   psplash_fb_draw_image (fb, 
-			 (fb->width  - HAND_IMG_WIDTH)/2, 
-			 (fb->height - HAND_IMG_HEIGHT)/2, 
-			 HAND_IMG_WIDTH,
-			 HAND_IMG_HEIGHT,
-			 HAND_IMG_BYTES_PER_PIXEL,
-			 HAND_IMG_RLE_PIXEL_DATA);
+			 (fb->width  - POKY_IMG_WIDTH)/2, 
+			 (fb->height - POKY_IMG_HEIGHT)/2, 
+			 POKY_IMG_WIDTH,
+			 POKY_IMG_HEIGHT,
+			 POKY_IMG_BYTES_PER_PIXEL,
+			 POKY_IMG_RLE_PIXEL_DATA);
 
   /* Draw progress bar border */
   psplash_fb_draw_image (fb, 

@@ -322,7 +322,8 @@ psplash_fb_draw_image (PSplashFB    *fb,
 
 	  do
 	    {
-	      psplash_fb_plot_pixel (fb, x+dx, y+dy, *p, *(p+1), *(p+2));
+              if (*(p+3))
+	      psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p+2), *(p+1), *(p));
 	      if (++dx >= img_width) { dx=0; dy++; }
 	    }
 	  while (--len && (p - rle_data) < total_len);
@@ -335,7 +336,8 @@ psplash_fb_draw_image (PSplashFB    *fb,
 
 	  do
 	    {
-	      psplash_fb_plot_pixel (fb, x+dx, y+dy, *p, *(p+1), *(p+2));
+              if (*(p+3))
+	      psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p+2), *(p+1), *(p));
 	      if (++dx >= img_width) { dx=0; dy++; }
 	      p += img_bytes_per_pixel;
 	    }
