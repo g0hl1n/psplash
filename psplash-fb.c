@@ -142,6 +142,12 @@ psplash_fb_new (int angle)
         goto fail;
     }
 
+  if (ioctl (fb->fd, FBIOGET_VSCREENINFO, &fb_var) == -1)
+    {
+      perror ("Error getting variable framebuffer info (2)");
+      goto fail;
+    }
+
   /* NB: It looks like the fbdev concept of fixed vs variable screen info is
    * broken. The line_length is part of the fixed info but it can be changed
    * if you set a new pixel format. */
@@ -157,6 +163,33 @@ psplash_fb_new (int angle)
   fb->stride = fb_fix.line_length;
   fb->type   = fb_fix.type;
   fb->visual = fb_fix.visual;
+
+  fb->red_offset = fb_var.red.offset;
+  fb->red_length = fb_var.red.length;
+  fb->green_offset = fb_var.green.offset;
+  fb->green_length = fb_var.green.length;
+  fb->blue_offset = fb_var.blue.offset;
+  fb->blue_length = fb_var.blue.length;
+
+  if (fb->red_offset == 11 && fb->red_length == 5 &&
+      fb->green_offset == 5 && fb->green_length == 6 &&
+      fb->blue_offset == 0 && fb->blue_length == 5) {
+         fb->rgbmode = RGB565;
+  } else if (fb->red_offset == 0 && fb->red_length == 5 &&
+      fb->green_offset == 5 && fb->green_length == 6 &&
+      fb->blue_offset == 11 && fb->blue_length == 5) {
+         fb->rgbmode = BGR565;
+  } else if (fb->red_offset == 16 && fb->red_length == 8 &&
+      fb->green_offset == 8 && fb->green_length == 8 &&
+      fb->blue_offset == 0 && fb->blue_length == 8) {
+         fb->rgbmode = RGB888;
+  } else if (fb->red_offset == 0 && fb->red_length == 8 &&
+      fb->green_offset == 8 && fb->green_length == 8 &&
+      fb->blue_offset == 8 && fb->blue_length == 8) {
+         fb->rgbmode = BGR888;
+  } else {
+         fb->rgbmode = GENERIC;
+  }
 
   DBG("width: %i, height: %i, bpp: %i, stride: %i",
       fb->width, fb->height, fb->bpp, fb->stride);
@@ -257,24 +290,60 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
       break;
     }
 
-  /* FIXME: handle no RGB orderings */
-  switch (fb->bpp)
-    {
-    case 24:
-    case 32:
-      *(fb->data + off)     = red;
-      *(fb->data + off + 1) = green;
-      *(fb->data + off + 2) = blue;
-      break;
-    case 16:
-      *(volatile uint16 *) (fb->data + off)
-	= ((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3);
-      break;
-    default:
-      /* depth not supported yet */
-      break;
-    }
-
+  if (fb->rgbmode == RGB565 || fb->rgbmode == RGB888) {
+    switch (fb->bpp)
+      {
+      case 24:
+      case 32:
+        *(fb->data + off)     = blue;
+        *(fb->data + off + 1) = green;
+        *(fb->data + off + 2) = red;
+        break;
+      case 16:
+        *(volatile uint16_t *) (fb->data + off)
+	  = ((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3);
+        break;
+      default:
+        /* depth not supported yet */
+        break;
+      }
+  } else if (fb->rgbmode == BGR565 || fb->rgbmode == BGR888) {
+    switch (fb->bpp)
+      {
+      case 24:
+      case 32:
+        *(fb->data + off)     = red;
+        *(fb->data + off + 1) = green;
+        *(fb->data + off + 2) = blue;
+        break;
+      case 16:
+        *(volatile uint16_t *) (fb->data + off)
+	  = ((blue >> 3) << 11) | ((green >> 2) << 5) | (red >> 3);
+        break;
+      default:
+        /* depth not supported yet */
+        break;
+      }
+  } else {
+    switch (fb->bpp)
+      {
+      case 32:
+        *(volatile uint32_t *) (fb->data + off)
+	  = ((red >> (8 - fb->red_length)) << fb->red_offset) 
+	      | ((green >> (8 - fb->green_length)) << fb->green_offset)
+	      | ((blue >> (8 - fb->blue_length)) << fb->blue_offset);
+        break;
+      case 16:
+        *(volatile uint16_t *) (fb->data + off)
+	  = ((red >> (8 - fb->red_length)) << fb->red_offset) 
+	      | ((green >> (8 - fb->green_length)) << fb->green_offset)
+	      | ((blue >> (8 - fb->blue_length)) << fb->blue_offset);
+        break;
+      default:
+        /* depth not supported yet */
+        break;
+      }
+  }
 }
 
 void
@@ -323,7 +392,7 @@ psplash_fb_draw_image (PSplashFB    *fb,
 	  do
 	    {
 	      if (img_bytes_per_pixel < 4 || *(p+3))
-	        psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p+2), *(p+1), *(p));
+	        psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p), *(p+1), *(p+2));
 	      if (++dx >= img_width) { dx=0; dy++; }
 	    }
 	  while (--len && (p - rle_data) < total_len);
@@ -337,7 +406,7 @@ psplash_fb_draw_image (PSplashFB    *fb,
 	  do
 	    {
 	      if (img_bytes_per_pixel < 4 || *(p+3))
-	        psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p+2), *(p+1), *(p));
+	        psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p), *(p+1), *(p+2));
 	      if (++dx >= img_width) { dx=0; dy++; }
 	      p += img_bytes_per_pixel;
 	    }

@@ -29,6 +29,7 @@
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #if defined(__i386__) || defined(__alpha__)
@@ -42,8 +43,8 @@
 #include <termios.h>
 #include <unistd.h>
 
-typedef unsigned char  uint8;
-typedef unsigned short uint16;
+typedef uint8_t  uint8;
+typedef uint16_t uint16;
 typedef int            bool;
 
 #ifndef FALSE

@@ -1,3 +1,11 @@
+2009-05-28  Richard Purdie <rpurdie@linux.intel.com>
+
+	* psplash-fb.c:
+	* psplash-fb.h:
+	* psplash.h:
+	Fix so the code honours whatever bit order the display reports with 
+	fast paths for the most common cases.
+
 2009-05-19  Richard Purdie <rpurdie@linux.intel.com>
 
 	* psplash-fb.c:

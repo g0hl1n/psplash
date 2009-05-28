@@ -18,6 +18,14 @@
 #ifndef _HAVE_PSPLASH_FB_H
 #define _HAVE_PSPLASH_FB_H
 
+enum RGBMode {
+    RGB565,
+    BGR565,
+    RGB888,
+    BGR888,
+    GENERIC,
+};
+
 typedef struct PSplashFB
 {
   int            fd;			
@@ -32,6 +40,14 @@ typedef struct PSplashFB
 
   int            angle;
   int            real_width, real_height;
+
+  enum RGBMode   rgbmode;
+  int            red_offset;
+  int            red_length;
+  int            green_offset;
+  int            green_length;
+  int            blue_offset;
+  int            blue_length;
 }
 PSplashFB;
 
