@@ -266,10 +266,10 @@ main (int argc, char** argv)
   /* Clear the background with #ecece1 */
   psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height, 0xec, 0xec, 0xe1);
 
-  /* Draw the OH logo  */
+  /* Draw the Poky logo  */
   psplash_fb_draw_image (fb, 
 			 (fb->width  - POKY_IMG_WIDTH)/2, 
-			 (fb->height - POKY_IMG_HEIGHT)/2, 
+			 ((fb->height * 5) / 6 - POKY_IMG_HEIGHT)/2,
 			 POKY_IMG_WIDTH,
 			 POKY_IMG_HEIGHT,
 			 POKY_IMG_BYTES_PER_PIXEL,
