@@ -49,12 +49,12 @@ psplash_draw_msg (PSplashFB *fb, const char *msg)
 			fb->height - (fb->height/6) - h, 
 			fb->width,
 			h,
-			0xec, 0xec, 0xe1);
+			PSPLASH_BACKGROUND_COLOR);
 
   psplash_fb_draw_text (fb,
 			(fb->width-w)/2, 
 			fb->height - (fb->height/6) - h,
-			0x6d, 0x6d, 0x70,
+			PSPLASH_TEXT_COLOR,
 			&radeon_font,
 			msg);
 }
@@ -75,19 +75,19 @@ psplash_draw_progress (PSplashFB *fb, int value)
       barwidth = (CLAMP(value,0,100) * width) / 100;
       psplash_fb_draw_rect (fb, x + barwidth, y, 
     			width - barwidth, height,
-			0xec, 0xec, 0xe1);
+			PSPLASH_BAR_BACKGROUND_COLOR);
       psplash_fb_draw_rect (fb, x, y, barwidth,
-			    height, 0x6d, 0x6d, 0x70);
+			    height, PSPLASH_BAR_COLOR);
     }
   else
     {
       barwidth = (CLAMP(-value,0,100) * width) / 100;
       psplash_fb_draw_rect (fb, x, y, 
     			width - barwidth, height,
-			0xec, 0xec, 0xe1);
+			PSPLASH_BAR_BACKGROUND_COLOR);
       psplash_fb_draw_rect (fb, x + width - barwidth,
 			    y, barwidth, height,
-			    0x6d, 0x6d, 0x70);
+			    PSPLASH_BAR_COLOR);
     }
 
   DBG("value: %i, width: %i, barwidth :%i\n", value, 
@@ -264,7 +264,8 @@ main (int argc, char** argv)
   }
 
   /* Clear the background with #ecece1 */
-  psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height, 0xec, 0xec, 0xe1);
+  psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height,
+                        PSPLASH_BACKGROUND_COLOR);
 
   /* Draw the Poky logo  */
   psplash_fb_draw_image (fb, 

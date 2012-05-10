@@ -83,5 +83,6 @@ PSplashFont;
 
 #include "psplash-fb.h"
 #include "psplash-console.h"
+#include "psplash-colors.h"
 
 #endif
