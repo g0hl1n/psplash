@@ -219,7 +219,7 @@ main (int argc, char** argv)
 
       if (!strcmp(argv[i],"-a") || !strcmp(argv[i],"--angle"))
         {
-	  if (++i > argc) goto fail;
+	  if (++i >= argc) goto fail;
 	  angle = atoi(argv[i]);
 	  continue;
 	}
