@@ -1,4 +1,7 @@
 #!/bin/sh
+
+set -e
+
 imageh=`basename $1 .png`-img.h
 name="${2}_IMG"
 gdk-pixbuf-csource --macros $1 > $imageh.tmp
