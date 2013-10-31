@@ -23,6 +23,20 @@
 #include "psplash-bar-img.h"
 #include "radeon-font.h"
 
+/* Here you can define a message which will be displayed above the
+ * progress bar.
+ * The message can be either read from a file:
+ *    Set MSG_FILE_PATH (and if needed MSG_FILE_{MAX_LEN,PREFIX})
+ *    to display the first MSG_FILE_MAX_LEN characters
+ *    of the first line from MSG_FILE_PATH as message.
+ *    Additionally the content of MSG_FILE_PREFIX will be displayed
+ *    before the read message. */
+#define MSG_FILE_PATH ""
+#define MSG_FILE_MAX_LEN 32
+#define MSG_FILE_PREFIX ""
+/* Or a fixed string can be used:
+ *    If MSG_FILE is not set or not readable
+ *    the content of MSG will be used as message. */
 #define MSG ""
 
 void
@@ -204,6 +218,8 @@ main (int argc, char** argv)
   int        pipe_fd, i = 0, angle = 0, ret = 0;
   PSplashFB *fb;
   bool       disable_console_switch = FALSE;
+  FILE      *fd_msg;
+  char      *str_msg;
   
   signal(SIGHUP, psplash_exit);
   signal(SIGINT, psplash_exit);
@@ -287,7 +303,30 @@ main (int argc, char** argv)
 
   psplash_draw_progress (fb, 0);
 
-  psplash_draw_msg (fb, MSG);
+  /* Draw message from file or defined MSG */
+  fd_msg = fopen (MSG_FILE_PATH, "r");
+  if (fd_msg==NULL) {
+    psplash_draw_msg (fb, MSG);
+  } else {
+    str_msg = (char*) malloc (
+              (MSG_FILE_MAX_LEN + strlen(MSG_FILE_PREFIX) + 1)*sizeof(char));
+    if (str_msg != NULL && fgets (str_msg, MSG_FILE_MAX_LEN, fd_msg)!=NULL) {
+      if (strlen (MSG_FILE_PREFIX) > 0) {
+        /* if MSG_FILE_PREFIX is set, prepend it to str_msg */
+        memmove (str_msg + strlen(MSG_FILE_PREFIX) + 1, str_msg, strlen(str_msg));
+        strcpy (str_msg, MSG_FILE_PREFIX);
+		/* replace \0 after MSG_FILE_PREFIX with a space */
+        str_msg[strlen(MSG_FILE_PREFIX)] = ' ';
+      }
+      psplash_draw_msg (fb, str_msg);
+      free (str_msg);
+    } else {
+      /* MSG_FILE_PATH is empty (or malloc failed)
+	   *    so display MSG_FILE_PREFIX only */
+      psplash_draw_msg (fb, MSG_FILE_PREFIX);
+    }
+    fclose (fd_msg);
+  }
 
   psplash_main (fb, pipe_fd, 0);
 
