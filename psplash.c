@@ -218,6 +218,7 @@ main (int argc, char** argv)
   int        pipe_fd, i = 0, angle = 0, ret = 0;
   PSplashFB *fb;
   bool       disable_console_switch = FALSE;
+  bool       disable_message = FALSE;
   FILE      *fd_msg;
   char      *str_msg;
   
@@ -233,6 +234,12 @@ main (int argc, char** argv)
 	  continue;
 	}
 
+      if (!strcmp(argv[i],"-m") || !strcmp(argv[i],"--no-message"))
+        {
+	  disable_message = TRUE;
+	  continue;
+	}
+
       if (!strcmp(argv[i],"-a") || !strcmp(argv[i],"--angle"))
         {
 	  if (++i >= argc) goto fail;
@@ -242,7 +249,7 @@ main (int argc, char** argv)
       
     fail:
       fprintf(stderr, 
-	      "Usage: %s [-n|--no-console-switch][-a|--angle <0|90|180|270>]\n", 
+	      "Usage: %s [-n|--no-console-switch][-m|--no-message][-a|--angle <0|90|180|270>]\n",
 	      argv[0]);
       exit(-1);
     }
@@ -304,28 +311,30 @@ main (int argc, char** argv)
   psplash_draw_progress (fb, 0);
 
   /* Draw message from file or defined MSG */
-  fd_msg = fopen (MSG_FILE_PATH, "r");
-  if (fd_msg==NULL) {
-    psplash_draw_msg (fb, MSG);
-  } else {
-    str_msg = (char*) malloc (
-              (MSG_FILE_MAX_LEN + strlen(MSG_FILE_PREFIX) + 1)*sizeof(char));
-    if (str_msg != NULL && fgets (str_msg, MSG_FILE_MAX_LEN, fd_msg)!=NULL) {
-      if (strlen (MSG_FILE_PREFIX) > 0) {
-        /* if MSG_FILE_PREFIX is set, prepend it to str_msg */
-        memmove (str_msg + strlen(MSG_FILE_PREFIX) + 1, str_msg, strlen(str_msg));
-        strcpy (str_msg, MSG_FILE_PREFIX);
-		/* replace \0 after MSG_FILE_PREFIX with a space */
-        str_msg[strlen(MSG_FILE_PREFIX)] = ' ';
-      }
-      psplash_draw_msg (fb, str_msg);
-      free (str_msg);
+  if(!disable_message) {
+    fd_msg = fopen (MSG_FILE_PATH, "r");
+    if (fd_msg==NULL) {
+      psplash_draw_msg (fb, MSG);
     } else {
-      /* MSG_FILE_PATH is empty (or malloc failed)
-	   *    so display MSG_FILE_PREFIX only */
-      psplash_draw_msg (fb, MSG_FILE_PREFIX);
+      str_msg = (char*) malloc (
+                (MSG_FILE_MAX_LEN + strlen(MSG_FILE_PREFIX) + 1)*sizeof(char));
+      if (str_msg != NULL && fgets (str_msg, MSG_FILE_MAX_LEN, fd_msg)!=NULL) {
+        if (strlen (MSG_FILE_PREFIX) > 0) {
+          /* if MSG_FILE_PREFIX is set, prepend it to str_msg */
+          memmove (str_msg + strlen(MSG_FILE_PREFIX) + 1, str_msg, strlen(str_msg));
+          strcpy (str_msg, MSG_FILE_PREFIX);
+          /* replace \0 after MSG_FILE_PREFIX with a space */
+          str_msg[strlen(MSG_FILE_PREFIX)] = ' ';
+        }
+        psplash_draw_msg (fb, str_msg);
+        free (str_msg);
+      } else {
+        /* MSG_FILE_PATH is empty (or malloc failed)
+         *    so display MSG_FILE_PREFIX only */
+        psplash_draw_msg (fb, MSG_FILE_PREFIX);
+      }
+      fclose (fd_msg);
     }
-    fclose (fd_msg);
   }
 
   psplash_main (fb, pipe_fd, 0);
