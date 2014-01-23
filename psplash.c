@@ -220,6 +220,7 @@ main (int argc, char** argv)
   bool       disable_console_switch = FALSE;
   bool       disable_message = FALSE;
   bool       disable_progress_bar = FALSE;
+  bool       disable_logo = FALSE;
   FILE      *fd_msg;
   char      *str_msg;
   
@@ -247,6 +248,12 @@ main (int argc, char** argv)
 	  continue;
 	}
 
+      if (!strcmp(argv[i],"-l") || !strcmp(argv[i],"--no-logo"))
+        {
+	  disable_logo = TRUE;
+	  continue;
+	}
+
       if (!strcmp(argv[i],"-a") || !strcmp(argv[i],"--angle"))
         {
 	  if (++i >= argc) goto fail;
@@ -256,7 +263,7 @@ main (int argc, char** argv)
       
     fail:
       fprintf(stderr, 
-	      "Usage: %s [-n|--no-console-switch][-m|--no-message][-p|--no-progress][-a|--angle <0|90|180|270>]\n",
+	      "Usage: %s [-n|--no-console-switch][-m|--no-message][-p|--no-progress][-l|--no-logo][-a|--angle <0|90|180|270>]\n",
 	      argv[0]);
       exit(-1);
     }
@@ -298,13 +305,15 @@ main (int argc, char** argv)
                         PSPLASH_BACKGROUND_COLOR);
 
   /* Draw the Poky logo  */
-  psplash_fb_draw_image (fb, 
-			 (fb->width  - POKY_IMG_WIDTH)/2, 
-			 ((fb->height * 5) / 6 - POKY_IMG_HEIGHT)/2,
-			 POKY_IMG_WIDTH,
-			 POKY_IMG_HEIGHT,
-			 POKY_IMG_BYTES_PER_PIXEL,
-			 POKY_IMG_RLE_PIXEL_DATA);
+  if (!disable_logo) {
+    psplash_fb_draw_image (fb,
+      (fb->width  - POKY_IMG_WIDTH)/2,
+      ((fb->height * 5) / 6 - POKY_IMG_HEIGHT)/2,
+      POKY_IMG_WIDTH,
+      POKY_IMG_HEIGHT,
+      POKY_IMG_BYTES_PER_PIXEL,
+      POKY_IMG_RLE_PIXEL_DATA);
+  }
 
   /* Draw progress bar border */
   if (!disable_progress_bar) {
