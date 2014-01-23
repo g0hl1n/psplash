@@ -48,6 +48,7 @@ typedef struct PSplashFB
   int            green_length;
   int            blue_offset;
   int            blue_length;
+  int            alloc;
 }
 PSplashFB;
 
@@ -56,6 +57,9 @@ psplash_fb_destroy (PSplashFB *fb);
 
 PSplashFB*
 psplash_fb_new (int angle);
+
+void
+psplash_fb_flush (PSplashFB *fb);
 
 inline void
 psplash_fb_plot_pixel (PSplashFB    *fb, 

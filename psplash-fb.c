@@ -19,10 +19,19 @@
 void
 psplash_fb_destroy (PSplashFB *fb)
 {
+  if (fb->alloc == 1)
+      free(fb->base);
   if (fb->fd >= 0)
     close (fb->fd);
 
   free(fb);
+}
+
+void
+psplash_fb_flush (PSplashFB *fb)
+{
+  if (fb->alloc == 1)
+      pwrite(fb->fd, fb->base, fb->stride * fb->height, 0);
 }
 
 static int
@@ -119,6 +128,7 @@ psplash_fb_new (int angle)
   memset (fb, 0, sizeof(PSplashFB));
 
   fb->fd = -1;
+  fb->alloc = -1;
 
   if ((fb->fd = open (fbdev, O_RDWR)) < 0)
     {
@@ -194,17 +204,25 @@ psplash_fb_new (int angle)
   DBG("width: %i, height: %i, bpp: %i, stride: %i",
       fb->width, fb->height, fb->bpp, fb->stride);
 
+  size_t size = fb->stride * fb->height;
+
   fb->base = (char *) mmap ((caddr_t) NULL,
 			    /*fb_fix.smem_len */
-			    fb->stride * fb->height,
+			    size,
 			    PROT_READ|PROT_WRITE,
 			    MAP_SHARED,
 			    fb->fd, 0);
 
   if (fb->base == (char *)-1)
     {
-      perror("Error cannot mmap framebuffer ");
-      goto fail;
+      fprintf(stdout, "Error cannot mmap framebuffer. Using malloc instead.\n");
+	  fb->base = (char*)malloc(size);
+      if (!fb->base)
+        {
+          perror("Error cannot allocate memory.");
+          goto fail;
+        }
+      fb->alloc = 1;
     }
 
   off = (unsigned long) fb_fix.smem_start % (unsigned long) getpagesize();

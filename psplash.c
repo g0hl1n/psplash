@@ -71,6 +71,8 @@ psplash_draw_msg (PSplashFB *fb, const char *msg)
 			PSPLASH_TEXT_COLOR,
 			&radeon_font,
 			msg);
+
+  psplash_fb_flush (fb);
 }
 
 void
@@ -103,6 +105,8 @@ psplash_draw_progress (PSplashFB *fb, int value)
 			    y, barwidth, height,
 			    PSPLASH_BAR_COLOR);
     }
+
+  psplash_fb_flush (fb);
 
   DBG("value: %i, width: %i, barwidth :%i\n", value, 
 		width, barwidth);
@@ -354,6 +358,8 @@ main (int argc, char** argv)
       fclose (fd_msg);
     }
   }
+
+  psplash_fb_flush (fb);
 
   psplash_main (fb, pipe_fd, 0);
 
