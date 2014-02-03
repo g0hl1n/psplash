@@ -1,0 +1,14 @@
+This file documents the major additions and syntax changes of psplash,
+starting after the fork from git.yoctoproject.org in October 2013.
+
+ENHANCEMENTS
+	* New option to read displayed message from file:
+	   Using the MSG_FILE_ defines found in psplash.c
+
+	* New command line option to disable message (-m|--no-message)
+
+	* New command line option to disable progress bar (-p|--no-progress)
+
+	* New command line option to disable logo (-l|--no-logo)
+
+	* Now supporting systems without mmap support (using malloc)
