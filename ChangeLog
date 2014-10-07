@@ -1,3 +1,10 @@
+2014-10-07  Olaf Mandel <o.mandel@menlosystems.com>
+
+	* psplash-fb.c:
+	* psplash-fb.h:
+	* psplash.c:
+	Images: handle rowstride != width*bytes_per_pixel
+
 2009-05-28  Richard Purdie <rpurdie@linux.intel.com>
 
 	* psplash-fb.c:

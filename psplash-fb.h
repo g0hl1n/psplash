@@ -82,6 +82,7 @@ psplash_fb_draw_image (PSplashFB    *fb,
 		       int          img_width, 
 		       int          img_height,
 		       int          img_bytes_pre_pixel,
+		       int          img_rowstride,
 		       uint8       *rle_data);
 
 void

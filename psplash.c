@@ -274,6 +274,7 @@ main (int argc, char** argv)
 			 POKY_IMG_WIDTH,
 			 POKY_IMG_HEIGHT,
 			 POKY_IMG_BYTES_PER_PIXEL,
+			 POKY_IMG_ROWSTRIDE,
 			 POKY_IMG_RLE_PIXEL_DATA);
 
   /* Draw progress bar border */
@@ -283,6 +284,7 @@ main (int argc, char** argv)
 			 BAR_IMG_WIDTH,
 			 BAR_IMG_HEIGHT,
 			 BAR_IMG_BYTES_PER_PIXEL,
+			 BAR_IMG_ROWSTRIDE,
 			 BAR_IMG_RLE_PIXEL_DATA);
 
   psplash_draw_progress (fb, 0);

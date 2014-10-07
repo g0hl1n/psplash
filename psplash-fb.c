@@ -370,13 +370,14 @@ psplash_fb_draw_image (PSplashFB    *fb,
 		       int          img_width,
 		       int          img_height,
 		       int          img_bytes_per_pixel,
+		       int          img_rowstride,
 		       uint8       *rle_data)
 {
   uint8       *p = rle_data;
   int          dx = 0, dy = 0,  total_len;
   unsigned int len;
 
-  total_len = img_width * img_height * img_bytes_per_pixel;
+  total_len = img_rowstride * img_height;
 
   /* FIXME: Optimise, check for over runs ... */
   while ((p - rle_data) < total_len)
@@ -391,11 +392,11 @@ psplash_fb_draw_image (PSplashFB    *fb,
 
 	  do
 	    {
-	      if (img_bytes_per_pixel < 4 || *(p+3))
+	      if ((img_bytes_per_pixel < 4 || *(p+3)) && dx < img_width)
 	        psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p), *(p+1), *(p+2));
-	      if (++dx >= img_width) { dx=0; dy++; }
+	      if (++dx * img_bytes_per_pixel >= img_rowstride) { dx=0; dy++; }
 	    }
-	  while (--len && (p - rle_data) < total_len);
+	  while (--len);
 
 	  p += img_bytes_per_pixel;
 	}
@@ -405,9 +406,9 @@ psplash_fb_draw_image (PSplashFB    *fb,
 
 	  do
 	    {
-	      if (img_bytes_per_pixel < 4 || *(p+3))
+	      if ((img_bytes_per_pixel < 4 || *(p+3)) && dx < img_width)
 	        psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p), *(p+1), *(p+2));
-	      if (++dx >= img_width) { dx=0; dy++; }
+	      if (++dx * img_bytes_per_pixel >= img_rowstride) { dx=0; dy++; }
 	      p += img_bytes_per_pixel;
 	    }
 	  while (--len && (p - rle_data) < total_len);
