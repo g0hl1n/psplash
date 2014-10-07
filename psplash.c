@@ -19,11 +19,18 @@
  */
 
 #include "psplash.h"
+#include "psplash-config.h"
+#include "psplash-colors.h"
 #include "psplash-poky-img.h"
 #include "psplash-bar-img.h"
 #include "radeon-font.h"
 
-#define MSG ""
+#define SPLIT_LINE_POS(fb)                                  \
+	(  (fb)->height                                     \
+	 - ((  PSPLASH_IMG_SPLIT_DENOMINATOR                \
+	     - PSPLASH_IMG_SPLIT_NUMERATOR)                 \
+	    * (fb)->height / PSPLASH_IMG_SPLIT_DENOMINATOR) \
+	)
 
 void
 psplash_exit (int signum)
@@ -46,14 +53,14 @@ psplash_draw_msg (PSplashFB *fb, const char *msg)
 
   psplash_fb_draw_rect (fb, 
 			0, 
-			fb->height - (fb->height/6) - h, 
+			SPLIT_LINE_POS(fb) - h, 
 			fb->width,
 			h,
 			PSPLASH_BACKGROUND_COLOR);
 
   psplash_fb_draw_text (fb,
 			(fb->width-w)/2, 
-			fb->height - (fb->height/6) - h,
+			SPLIT_LINE_POS(fb) - h,
 			PSPLASH_TEXT_COLOR,
 			&radeon_font,
 			msg);
@@ -66,7 +73,7 @@ psplash_draw_progress (PSplashFB *fb, int value)
 
   /* 4 pix border */
   x      = ((fb->width  - BAR_IMG_WIDTH)/2) + 4 ;
-  y      = fb->height - (fb->height/6) + 4;
+  y      = SPLIT_LINE_POS(fb) + 4;
   width  = BAR_IMG_WIDTH - 8; 
   height = BAR_IMG_HEIGHT - 8;
 
@@ -270,7 +277,12 @@ main (int argc, char** argv)
   /* Draw the Poky logo  */
   psplash_fb_draw_image (fb, 
 			 (fb->width  - POKY_IMG_WIDTH)/2, 
-			 ((fb->height * 5) / 6 - POKY_IMG_HEIGHT)/2,
+#if PSPLASH_IMG_FULLSCREEN
+			 (fb->height - POKY_IMG_HEIGHT)/2,
+#else
+			 (fb->height * PSPLASH_IMG_SPLIT_NUMERATOR
+			  / PSPLASH_IMG_SPLIT_DENOMINATOR - POKY_IMG_HEIGHT)/2,
+#endif
 			 POKY_IMG_WIDTH,
 			 POKY_IMG_HEIGHT,
 			 POKY_IMG_BYTES_PER_PIXEL,
@@ -280,7 +292,7 @@ main (int argc, char** argv)
   /* Draw progress bar border */
   psplash_fb_draw_image (fb, 
 			 (fb->width  - BAR_IMG_WIDTH)/2, 
-			 fb->height - (fb->height/6), 
+			 SPLIT_LINE_POS(fb),
 			 BAR_IMG_WIDTH,
 			 BAR_IMG_HEIGHT,
 			 BAR_IMG_BYTES_PER_PIXEL,
@@ -289,7 +301,9 @@ main (int argc, char** argv)
 
   psplash_draw_progress (fb, 0);
 
-  psplash_draw_msg (fb, MSG);
+#ifdef PSPLASH_STARTUP_MSG
+  psplash_draw_msg (fb, PSPLASH_STARTUP_MSG);
+#endif
 
   psplash_main (fb, pipe_fd, 0);
 

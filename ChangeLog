@@ -5,6 +5,15 @@
 	* psplash.c:
 	Images: handle rowstride != width*bytes_per_pixel
 
+	* psplash-config.h:
+	* psplash.c:
+	* psplash.h:
+	Make appearance more configurable:
+	  - Allow not showing the startup message
+	  - Make the screen-split (between image and progress bar)
+	    configurable
+	  - Allow for fullscreen image (overlaid by progress bar)
+
 2009-05-28  Richard Purdie <rpurdie@linux.intel.com>
 
 	* psplash-fb.c:
