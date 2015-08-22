@@ -57,14 +57,6 @@ psplash_fb_destroy (PSplashFB *fb);
 PSplashFB*
 psplash_fb_new (int angle);
 
-inline void
-psplash_fb_plot_pixel (PSplashFB    *fb, 
-		       int          x, 
-		       int          y, 
-		       uint8        red,
-		       uint8        green,
-		       uint8        blue);
-
 void
 psplash_fb_draw_rect (PSplashFB    *fb, 
 		      int          x, 
