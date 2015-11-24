@@ -105,9 +105,6 @@ static int
 parse_command (PSplashFB *fb, char *string, int length) 
 {
   char *command;
-  int   parsed=0;
-
-  parsed = strlen(string)+1;
 
   DBG("got cmd %s", string);
 	
