@@ -3,7 +3,6 @@ AC_INIT(psplash, 0.1, [http://bugzilla.o-hand.com/enter_bug.cgi?product=psplash]
 AM_INIT_AUTOMAKE()
 AC_CONFIG_SRCDIR(psplash.c)
 AM_CONFIG_HEADER(config.h)
-AM_MAINTAINER_MODE
 
 AC_ISC_POSIX
 AC_PROG_CC
