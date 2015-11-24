@@ -185,7 +185,7 @@ psplash_fb_new (int angle)
          fb->rgbmode = RGB888;
   } else if (fb->red_offset == 0 && fb->red_length == 8 &&
       fb->green_offset == 8 && fb->green_length == 8 &&
-      fb->blue_offset == 8 && fb->blue_length == 8) {
+      fb->blue_offset == 16 && fb->blue_length == 8) {
          fb->rgbmode = BGR888;
   } else {
          fb->rgbmode = GENERIC;
