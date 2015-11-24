@@ -14,6 +14,8 @@
  *  GNU General Public License for more details.
  *
  */
+
+#include <endian.h>
 #include "psplash.h"
 
 void
@@ -294,11 +296,21 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
     switch (fb->bpp)
       {
       case 24:
-      case 32:
-        *(fb->data + off)     = blue;
+#if __BYTE_ORDER == __BIG_ENDIAN
+        *(fb->data + off + 0) = red;
+        *(fb->data + off + 1) = green;
+        *(fb->data + off + 2) = blue;
+#else
+        *(fb->data + off + 0) = blue;
         *(fb->data + off + 1) = green;
         *(fb->data + off + 2) = red;
+#endif
         break;
+      case 32:
+        *(volatile uint32_t *) (fb->data + off)
+          = (red << 16) | (green << 8) | (blue);
+        break;
+
       case 16:
         *(volatile uint16_t *) (fb->data + off)
 	  = ((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3);
@@ -311,10 +323,19 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
     switch (fb->bpp)
       {
       case 24:
-      case 32:
-        *(fb->data + off)     = red;
+#if __BYTE_ORDER == __BIG_ENDIAN
+        *(fb->data + off + 0) = blue;
+        *(fb->data + off + 1) = green;
+        *(fb->data + off + 2) = red;
+#else
+        *(fb->data + off + 0) = red;
         *(fb->data + off + 1) = green;
         *(fb->data + off + 2) = blue;
+#endif
+        break;
+      case 32:
+        *(volatile uint32_t *) (fb->data + off)
+          = (blue << 16) | (green << 8) | (red);
         break;
       case 16:
         *(volatile uint16_t *) (fb->data + off)
