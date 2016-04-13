@@ -8,3 +8,21 @@ rotation. Its visual look is configurable by basic source changes.
 
 Also included is a 'client' command utility for sending information to
 psplash such as boot progress information.
+
+Contributing
+============
+To contribute to this layer you should submit the patches for review to the
+mailing list (yocto@yoctoproject.org).
+
+Please refer to
+    http://openembedded.org/wiki/Commit_Patch_Message_Guidelines
+for some useful guidelines to be followed when submitting patches.
+
+Mailing list:
+    https://lists.yoctoproject.org/listinfo/yocto
+
+When creating patches, please use something like:
+    git format-patch -M -s --subject-prefix='psplash][PATCH' origin
+
+When sending patches, please use something like:
+    git send-email --to yocto@yoctoproject.org <generated patch>
