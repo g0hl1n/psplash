@@ -33,7 +33,7 @@
 	)
 
 void
-psplash_exit (int signum)
+psplash_exit (int UNUSED(signum))
 {
   DBG("mark");
 

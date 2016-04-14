@@ -69,6 +69,12 @@ typedef int            bool;
 #define DBG(x, a...) do {} while (0)
 #endif
 
+#ifdef __GNUC__
+#  define UNUSED(x) UNUSED_ ## x __attribute__((__unused__))
+#else
+#  define UNUSED(x) UNUSED_ ## x
+#endif
+
 typedef struct PSplashFont
 {
     char *name;				/* Font name. */
