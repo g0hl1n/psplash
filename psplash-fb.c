@@ -449,7 +449,7 @@ psplash_font_glyph (const PSplashFont *font, wchar_t wc, u_int32_t **bitmap)
     {
       for (i = font->offset[wc & mask]; font->index[i]; i += 2)
 	{
-	  if ((font->index[i] & ~mask) == (wc & ~mask))
+	  if ((wchar_t)(font->index[i] & ~mask) == (wc & ~mask))
 	    {
 	      if (bitmap != NULL)
 		*bitmap = &font->content[font->index[i+1]];
