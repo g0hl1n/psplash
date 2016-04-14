@@ -9,7 +9,7 @@ AC_PROG_CC
 AC_STDC_HEADERS
 
 if test "x$GCC" = "xyes"; then
-        GCC_FLAGS="-g -Wall"
+        GCC_FLAGS="-g -Wall -Wextra"
 fi
 
 AC_SUBST(GCC_FLAGS)
