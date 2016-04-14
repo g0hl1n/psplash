@@ -102,7 +102,7 @@ psplash_draw_progress (PSplashFB *fb, int value)
 }
 
 static int 
-parse_command (PSplashFB *fb, char *string, int length) 
+parse_command (PSplashFB *fb, char *string)
 {
   char *command;
 
@@ -175,14 +175,14 @@ psplash_main (PSplashFB *fb, int pipe_fd, int timeout)
       
       if (command[length-1] == '\0') 
 	{
-	  if (parse_command(fb, command, strlen(command))) 
+	  if (parse_command(fb, command))
 	    return;
 	  length = 0;
 	} 
       else if (command[length-1] == '\n') 
 	{
 	  command[length-1] = '\0';
-	  if (parse_command(fb, command, strlen(command))) 
+	  if (parse_command(fb, command))
 	    return;
 	  length = 0;
 	} 
