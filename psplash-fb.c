@@ -461,8 +461,7 @@ psplash_font_glyph (const PSplashFont *font, wchar_t wc, u_int32_t **bitmap)
 }
 
 void
-psplash_fb_text_size (PSplashFB          *fb,
-		      int                *width,
+psplash_fb_text_size (int                *width,
 		      int                *height,
 		      const PSplashFont  *font,
 		      const char         *text)
