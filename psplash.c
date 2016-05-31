@@ -245,10 +245,10 @@ main (int argc, char** argv)
   if (mkfifo(PSPLASH_FIFO, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP))
     {
       if (errno!=EEXIST) 
-	{
-	  perror("mkfifo");
-	  exit(-1);
-	}
+	    {
+	      perror("mkfifo");
+	      exit(-1);
+	    }
     }
 
   pipe_fd = open (PSPLASH_FIFO,O_RDONLY|O_NONBLOCK);
