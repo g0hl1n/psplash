@@ -38,7 +38,7 @@ typedef struct PSplashFB
   char		*data;
   char		*base;
 
-  int            angle;
+  int            angle, fbdev_id;
   int            real_width, real_height;
 
   enum RGBMode   rgbmode;
@@ -55,7 +55,7 @@ void
 psplash_fb_destroy (PSplashFB *fb);
 
 PSplashFB*
-psplash_fb_new (int angle);
+psplash_fb_new (int angle, int fbdev_id);
 
 void
 psplash_fb_draw_rect (PSplashFB    *fb, 

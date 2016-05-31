@@ -99,18 +99,20 @@ attempt_to_change_pixel_format (PSplashFB *fb,
 }
 
 PSplashFB*
-psplash_fb_new (int angle)
+psplash_fb_new (int angle, int fbdev_id)
 {
   struct fb_var_screeninfo fb_var;
   struct fb_fix_screeninfo fb_fix;
   int                      off;
-  char                    *fbdev;
+  char                     fbdev[9] = "/dev/fb0";
 
   PSplashFB *fb = NULL;
 
-  fbdev = getenv("FBDEV");
-  if (fbdev == NULL)
-    fbdev = "/dev/fb0";
+  if (fbdev_id > 0 && fbdev_id < 10)
+    {
+        // Conversion from integer to ascii.
+        fbdev[7] = fbdev_id + 48;
+    }
 
   if ((fb = malloc (sizeof(PSplashFB))) == NULL)
     {
@@ -124,7 +126,9 @@ psplash_fb_new (int angle)
 
   if ((fb->fd = open (fbdev, O_RDWR)) < 0)
     {
-      perror ("Error opening /dev/fb0");
+      fprintf(stderr,
+              "Error opening %s\n",
+              fbdev);
       goto fail;
     }
 

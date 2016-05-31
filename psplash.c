@@ -205,35 +205,41 @@ int
 main (int argc, char** argv) 
 {
   char      *tmpdir;
-  int        pipe_fd, i = 0, angle = 0, ret = 0;
+  int        pipe_fd, i = 0, angle = 0, fbdev_id = 0, ret = 0;
   PSplashFB *fb;
   bool       disable_console_switch = FALSE;
-  
+
   signal(SIGHUP, psplash_exit);
   signal(SIGINT, psplash_exit);
   signal(SIGQUIT, psplash_exit);
 
-  while (++i < argc)
-    {
-      if (!strcmp(argv[i],"-n") || !strcmp(argv[i],"--no-console-switch"))
-        {
-	  disable_console_switch = TRUE;
-	  continue;
-	}
+  while (++i < argc) {
+    if (!strcmp(argv[i],"-n") || !strcmp(argv[i],"--no-console-switch"))
+      {
+        disable_console_switch = TRUE;
+        continue;
+      }
 
-      if (!strcmp(argv[i],"-a") || !strcmp(argv[i],"--angle"))
-        {
-	  if (++i >= argc) goto fail;
-	  angle = atoi(argv[i]);
-	  continue;
-	}
-      
+    if (!strcmp(argv[i],"-a") || !strcmp(argv[i],"--angle"))
+      {
+        if (++i >= argc) goto fail;
+        angle = atoi(argv[i]);
+        continue;
+      }
+
+    if (!strcmp(argv[i],"-f") || !strcmp(argv[i],"--fbdev"))
+      {
+        if (++i >= argc) goto fail;
+        fbdev_id = atoi(argv[i]);
+        continue;
+      }
+
     fail:
       fprintf(stderr, 
-	      "Usage: %s [-n|--no-console-switch][-a|--angle <0|90|180|270>]\n", 
-	      argv[0]);
+              "Usage: %s [-n|--no-console-switch][-a|--angle <0|90|180|270>][-f|--fbdev <0..9>]\n", 
+              argv[0]);
       exit(-1);
-    }
+  }
 
   tmpdir = getenv("TMPDIR");
 
@@ -262,10 +268,11 @@ main (int argc, char** argv)
   if (!disable_console_switch)
     psplash_console_switch ();
 
-  if ((fb = psplash_fb_new(angle)) == NULL) {
+  if ((fb = psplash_fb_new(angle,fbdev_id)) == NULL)
+    {
 	  ret = -1;
 	  goto fb_fail;
-  }
+    }
 
   /* Clear the background with #ecece1 */
   psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height,
