@@ -115,11 +115,17 @@ parse_command (PSplashFB *fb, char *string)
 
   if (!strcmp(command,"PROGRESS")) 
     {
-      psplash_draw_progress (fb, atoi(strtok(NULL,"\0")));
+      char *arg = strtok(NULL, "\0");
+
+      if (arg)
+        psplash_draw_progress (fb, atoi(arg));
     } 
   else if (!strcmp(command,"MSG")) 
     {
-      psplash_draw_msg (fb, strtok(NULL,"\0"));
+      char *arg = strtok(NULL, "\0");
+
+      if (arg)
+        psplash_draw_msg (fb, arg);
     } 
   else if (!strcmp(command,"QUIT")) 
     {
@@ -137,6 +143,7 @@ psplash_main (PSplashFB *fb, int pipe_fd, int timeout)
   fd_set         descriptors;
   struct timeval tv;
   char          *end;
+  char          *cmd;
   char           command[2048];
 
   tv.tv_sec = timeout;
@@ -172,21 +179,32 @@ psplash_main (PSplashFB *fb, int pipe_fd, int timeout)
 	  pipe_fd = open(PSPLASH_FIFO,O_RDONLY|O_NONBLOCK);
 	  goto out;
 	}
-      
-      if (command[length-1] == '\0') 
-	{
-	  if (parse_command(fb, command))
-	    return;
-	  length = 0;
-	} 
-      else if (command[length-1] == '\n') 
-	{
-	  command[length-1] = '\0';
-	  if (parse_command(fb, command))
-	    return;
-	  length = 0;
-	} 
 
+      cmd = command;
+      do {
+	int cmdlen;
+        char *cmdend = memchr(cmd, '\n', length);
+
+        /* Replace newlines with string termination */
+        if (cmdend)
+            *cmdend = '\0';
+
+        cmdlen = strnlen(cmd, length);
+
+        /* Skip string terminations */
+	if (!cmdlen && length)
+          {
+            length--;
+            cmd++;
+	    continue;
+          }
+
+	if (parse_command(fb, cmd))
+	  return;
+
+	length -= cmdlen;
+	cmd += cmdlen;
+      } while (length);
 
     out:
       end = &command[length];
