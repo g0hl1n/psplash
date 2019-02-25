@@ -204,7 +204,7 @@ psplash_main (PSplashFB *fb, int pipe_fd, int timeout)
 int 
 main (int argc, char** argv) 
 {
-  char      *tmpdir;
+  char      *rundir;
   int        pipe_fd, i = 0, angle = 0, fbdev_id = 0, ret = 0;
   PSplashFB *fb;
   bool       disable_console_switch = FALSE;
@@ -241,12 +241,12 @@ main (int argc, char** argv)
       exit(-1);
   }
 
-  tmpdir = getenv("TMPDIR");
+  rundir = getenv("PSPLASH_FIFO_DIR");
 
-  if (!tmpdir)
-    tmpdir = "/tmp";
+  if (!rundir)
+    rundir = "/run";
 
-  chdir(tmpdir);
+  chdir(rundir);
 
   if (mkfifo(PSPLASH_FIFO, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP))
     {

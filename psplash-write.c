@@ -29,13 +29,13 @@
 
 int main(int argc, char **argv) 
 {
-  char *tmpdir;
+  char *rundir;
   int   pipe_fd;
 
-  tmpdir = getenv("TMPDIR");
+  rundir = getenv("PSPLASH_FIFO_DIR");
 
-  if (!tmpdir)
-    tmpdir = "/tmp";
+  if (!rundir)
+    rundir = "/run";
 
   if (argc!=2) 
     {
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
       exit(-1);
     }
   
-  chdir(tmpdir);
+  chdir(rundir);
   
   if ((pipe_fd = open (PSPLASH_FIFO,O_WRONLY|O_NONBLOCK)) == -1)
     {
