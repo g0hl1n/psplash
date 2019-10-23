@@ -1,3 +1,7 @@
+/*
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 /* GdkPixbuf RGBA C-Source image dump 1-byte-run-length-encoded */
 
 #define POKY_IMG_ROWSTRIDE (1708)
