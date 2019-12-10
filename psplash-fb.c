@@ -14,6 +14,8 @@
  *  GNU General Public License for more details.
  *
  */
+
+#include <endian.h>
 #include "psplash.h"
 
 void
@@ -106,18 +108,20 @@ attempt_to_change_pixel_format (PSplashFB *fb,
 }
 
 PSplashFB*
-psplash_fb_new (int angle)
+psplash_fb_new (int angle, int fbdev_id)
 {
   struct fb_var_screeninfo fb_var;
   struct fb_fix_screeninfo fb_fix;
   int                      off;
-  char                    *fbdev;
+  char                     fbdev[9] = "/dev/fb0";
 
   PSplashFB *fb = NULL;
 
-  fbdev = getenv("FBDEV");
-  if (fbdev == NULL)
-    fbdev = "/dev/fb0";
+  if (fbdev_id > 0 && fbdev_id < 10)
+    {
+        // Conversion from integer to ascii.
+        fbdev[7] = fbdev_id + 48;
+    }
 
   if ((fb = malloc (sizeof(PSplashFB))) == NULL)
     {
@@ -132,7 +136,9 @@ psplash_fb_new (int angle)
 
   if ((fb->fd = open (fbdev, O_RDWR)) < 0)
     {
-      perror ("Error opening /dev/fb0");
+      fprintf(stderr,
+              "Error opening %s\n",
+              fbdev);
       goto fail;
     }
 
@@ -195,7 +201,7 @@ psplash_fb_new (int angle)
          fb->rgbmode = RGB888;
   } else if (fb->red_offset == 0 && fb->red_length == 8 &&
       fb->green_offset == 8 && fb->green_length == 8 &&
-      fb->blue_offset == 8 && fb->blue_length == 8) {
+      fb->blue_offset == 16 && fb->blue_length == 8) {
          fb->rgbmode = BGR888;
   } else {
          fb->rgbmode = GENERIC;
@@ -278,7 +284,7 @@ psplash_fb_new (int angle)
 
 #define OFFSET(fb,x,y) (((y) * (fb)->stride) + ((x) * ((fb)->bpp >> 3)))
 
-inline void
+static inline void
 psplash_fb_plot_pixel (PSplashFB    *fb,
 		       int          x,
 		       int          y,
@@ -312,11 +318,21 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
     switch (fb->bpp)
       {
       case 24:
-      case 32:
-        *(fb->data + off)     = blue;
+#if __BYTE_ORDER == __BIG_ENDIAN
+        *(fb->data + off + 0) = red;
+        *(fb->data + off + 1) = green;
+        *(fb->data + off + 2) = blue;
+#else
+        *(fb->data + off + 0) = blue;
         *(fb->data + off + 1) = green;
         *(fb->data + off + 2) = red;
+#endif
         break;
+      case 32:
+        *(volatile uint32_t *) (fb->data + off)
+          = (red << 16) | (green << 8) | (blue);
+        break;
+
       case 16:
         *(volatile uint16_t *) (fb->data + off)
 	  = ((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3);
@@ -329,10 +345,19 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
     switch (fb->bpp)
       {
       case 24:
-      case 32:
-        *(fb->data + off)     = red;
+#if __BYTE_ORDER == __BIG_ENDIAN
+        *(fb->data + off + 0) = blue;
+        *(fb->data + off + 1) = green;
+        *(fb->data + off + 2) = red;
+#else
+        *(fb->data + off + 0) = red;
         *(fb->data + off + 1) = green;
         *(fb->data + off + 2) = blue;
+#endif
+        break;
+      case 32:
+        *(volatile uint32_t *) (fb->data + off)
+          = (blue << 16) | (green << 8) | (red);
         break;
       case 16:
         *(volatile uint16_t *) (fb->data + off)
@@ -388,13 +413,14 @@ psplash_fb_draw_image (PSplashFB    *fb,
 		       int          img_width,
 		       int          img_height,
 		       int          img_bytes_per_pixel,
+		       int          img_rowstride,
 		       uint8       *rle_data)
 {
   uint8       *p = rle_data;
   int          dx = 0, dy = 0,  total_len;
   unsigned int len;
 
-  total_len = img_width * img_height * img_bytes_per_pixel;
+  total_len = img_rowstride * img_height;
 
   /* FIXME: Optimise, check for over runs ... */
   while ((p - rle_data) < total_len)
@@ -409,11 +435,11 @@ psplash_fb_draw_image (PSplashFB    *fb,
 
 	  do
 	    {
-	      if (img_bytes_per_pixel < 4 || *(p+3))
+	      if ((img_bytes_per_pixel < 4 || *(p+3)) && dx < img_width)
 	        psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p), *(p+1), *(p+2));
-	      if (++dx >= img_width) { dx=0; dy++; }
+	      if (++dx * img_bytes_per_pixel >= img_rowstride) { dx=0; dy++; }
 	    }
-	  while (--len && (p - rle_data) < total_len);
+	  while (--len);
 
 	  p += img_bytes_per_pixel;
 	}
@@ -423,9 +449,9 @@ psplash_fb_draw_image (PSplashFB    *fb,
 
 	  do
 	    {
-	      if (img_bytes_per_pixel < 4 || *(p+3))
+	      if ((img_bytes_per_pixel < 4 || *(p+3)) && dx < img_width)
 	        psplash_fb_plot_pixel (fb, x+dx, y+dy, *(p), *(p+1), *(p+2));
-	      if (++dx >= img_width) { dx=0; dy++; }
+	      if (++dx * img_bytes_per_pixel >= img_rowstride) { dx=0; dy++; }
 	      p += img_bytes_per_pixel;
 	    }
 	  while (--len && (p - rle_data) < total_len);
@@ -445,7 +471,7 @@ psplash_font_glyph (const PSplashFont *font, wchar_t wc, u_int32_t **bitmap)
     {
       for (i = font->offset[wc & mask]; font->index[i]; i += 2)
 	{
-	  if ((font->index[i] & ~mask) == (wc & ~mask))
+	  if ((wchar_t)(font->index[i] & ~mask) == (wc & ~mask))
 	    {
 	      if (bitmap != NULL)
 		*bitmap = &font->content[font->index[i+1]];
@@ -457,8 +483,7 @@ psplash_font_glyph (const PSplashFont *font, wchar_t wc, u_int32_t **bitmap)
 }
 
 void
-psplash_fb_text_size (PSplashFB          *fb,
-		      int                *width,
+psplash_fb_text_size (int                *width,
 		      int                *height,
 		      const PSplashFont  *font,
 		      const char         *text)
@@ -476,7 +501,8 @@ psplash_fb_text_size (PSplashFB          *fb,
       if (*c == '\n')
 	{
 	  if (w > mw)
-	    mw = 0;
+	    mw = w;
+	  w = 0;
 	  h += font->height;
 	  continue;
 	}

@@ -24,7 +24,7 @@ static int VTNumInitial   = -1;
 static int Visible        =  1;
 
 static void
-vt_request (int sig)
+vt_request (int UNUSED(sig))
 {
   DBG("mark, visible:%i", Visible);
 

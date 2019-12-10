@@ -38,7 +38,7 @@ typedef struct PSplashFB
   char		*data;
   char		*base;
 
-  int            angle;
+  int            angle, fbdev_id;
   int            real_width, real_height;
 
   enum RGBMode   rgbmode;
@@ -56,7 +56,7 @@ void
 psplash_fb_destroy (PSplashFB *fb);
 
 PSplashFB*
-psplash_fb_new (int angle);
+psplash_fb_new (int angle, int fbdev_id);
 
 void
 psplash_fb_flush (PSplashFB *fb);
@@ -86,11 +86,11 @@ psplash_fb_draw_image (PSplashFB    *fb,
 		       int          img_width, 
 		       int          img_height,
 		       int          img_bytes_pre_pixel,
+		       int          img_rowstride,
 		       uint8       *rle_data);
 
 void
-psplash_fb_text_size (PSplashFB          *fb,
-		      int                *width, 
+psplash_fb_text_size (int                *width,
 		      int                *height,
 		      const PSplashFont  *font,
 		      const char         *text);
