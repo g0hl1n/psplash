@@ -21,6 +21,7 @@ enum RGBMode {
 typedef struct PSplashFB
 {
   int            fd;			
+  struct fb_var_screeninfo fb_var;
   struct termios save_termios;	        
   int            type;		        
   int            visual;		
@@ -29,6 +30,11 @@ typedef struct PSplashFB
   int            stride;
   char		*data;
   char		*base;
+
+  /* Support for double buffering */
+  int		double_buffering;
+  char		*bdata;
+  char		*fdata;
 
   int            angle, fbdev_id;
   int            real_width, real_height;
@@ -85,5 +91,7 @@ psplash_fb_draw_text (PSplashFB         *fb,
 		      const PSplashFont *font,
 		      const char        *text);
 
+void
+psplash_fb_flip(PSplashFB *fb, int sync);
 
 #endif

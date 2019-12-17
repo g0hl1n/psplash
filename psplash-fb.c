@@ -10,6 +10,46 @@
 #include <endian.h>
 #include "psplash.h"
 
+static void
+psplash_wait_for_vsync(PSplashFB *fb)
+{
+  int err = ioctl(fb->fd, FBIO_WAITFORVSYNC, 0);
+  if (err != 0)
+    fprintf(stderr, "Error, FB vsync ioctl [%d]\n", err);
+}
+
+void
+psplash_fb_flip(PSplashFB *fb, int sync)
+{
+  char *tmp;
+
+  if (fb->double_buffering) {
+
+    /* Carry out the flip after a vsync */
+    psplash_wait_for_vsync(fb);
+
+    /* Switch the current activate area in fb */
+    if (fb->fb_var.yoffset == 0 ) {
+      fb->fb_var.yoffset = fb->real_height;
+    } else {
+      fb->fb_var.yoffset = 0;
+    }
+    if (ioctl(fb->fd, FBIOPAN_DISPLAY, &fb->fb_var) == -1 ) {
+      fprintf(stderr, "psplash_fb_flip: FBIOPAN_DISPLAY failed\n");
+    }
+
+    /* Switch the front and back data pointers */
+    tmp = fb->fdata;
+    fb->fdata = fb->bdata;
+    fb->bdata = tmp;
+
+    /* Sync new front to new back when requested */
+    if (sync) {
+      memcpy(fb->bdata, fb->fdata, fb->stride * fb->real_height);
+    }
+  }
+}
+
 void
 psplash_fb_destroy (PSplashFB *fb)
 {
@@ -155,6 +195,29 @@ psplash_fb_new (int angle, int fbdev_id)
       goto fail;
     }
 
+  /* Setup double virtual resolution for double buffering */
+  if (ioctl(fb->fd, FBIOPAN_DISPLAY, &fb_var) == -1) {
+    fprintf(stderr, "FBIOPAN_DISPLAY not supported, double buffering disabled");
+  } else {
+    if (fb_var.yres_virtual == fb_var.yres * 2) {
+      DBG("Virtual resolution already double");
+      fb->double_buffering = 1;
+    } else {
+      fb_var.yres_virtual = fb_var.yres * 2;
+      if (ioctl(fb->fd, FBIOPUT_VSCREENINFO, &fb_var) == -1) {
+        fprintf(stderr, "FBIOPUT_VSCREENINFO failed, double buffering disabled");
+      } else {
+        if (ioctl(fb->fd, FBIOGET_FSCREENINFO, &fb_fix) == -1) {
+          perror(" Error getting the fixed framebuffer info");
+          goto fail;
+        } else {
+          DBG("Virtual resolution set to double");
+          fb->double_buffering = 1;
+        }
+      }
+    }
+  }
+
   fb->real_width  = fb->width  = fb_var.xres;
   fb->real_height = fb->height = fb_var.yres;
   fb->bpp    = fb_var.bits_per_pixel;
@@ -193,8 +256,7 @@ psplash_fb_new (int angle, int fbdev_id)
       fb->width, fb->height, fb->bpp, fb->stride);
 
   fb->base = (char *) mmap ((caddr_t) NULL,
-			    /*fb_fix.smem_len */
-			    fb->stride * fb->height,
+			    fb_fix.smem_len,
 			    PROT_READ|PROT_WRITE,
 			    MAP_SHARED,
 			    fb->fd, 0);
@@ -208,6 +270,23 @@ psplash_fb_new (int angle, int fbdev_id)
   off = (unsigned long) fb_fix.smem_start % (unsigned long) getpagesize();
 
   fb->data = fb->base + off;
+
+  if (fb->double_buffering) {
+    /* fb_var is needed when flipping the buffers */
+    memcpy(&fb->fb_var, &fb_var, sizeof(struct fb_var_screeninfo));
+    if (fb->fb_var.yoffset == 0) {
+      printf("to back\n");
+      fb->fdata = fb->data;
+      fb->bdata = fb->data + fb->stride * fb->height;
+    } else {
+      printf("to front\n");
+      fb->fdata = fb->data + fb->stride * fb->height;
+      fb->bdata = fb->data;
+    }
+  } else {
+    fb->fdata = fb->data;
+    fb->bdata = fb->data;
+  }
 
 #if 0
   /* FIXME: No support for 8pp as yet  */
@@ -266,6 +345,8 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
 		       uint8        green,
 		       uint8        blue)
 {
+  /* Always write to back data (bdata) which points to the right data with or
+   * without double buffering support */
   int off;
 
   if (x < 0 || x > fb->width-1 || y < 0 || y > fb->height-1)
@@ -293,22 +374,22 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
       {
       case 24:
 #if __BYTE_ORDER == __BIG_ENDIAN
-        *(fb->data + off + 0) = red;
-        *(fb->data + off + 1) = green;
-        *(fb->data + off + 2) = blue;
+        *(fb->bdata + off + 0) = red;
+        *(fb->bdata + off + 1) = green;
+        *(fb->bdata + off + 2) = blue;
 #else
-        *(fb->data + off + 0) = blue;
-        *(fb->data + off + 1) = green;
-        *(fb->data + off + 2) = red;
+        *(fb->bdata + off + 0) = blue;
+        *(fb->bdata + off + 1) = green;
+        *(fb->bdata + off + 2) = red;
 #endif
         break;
       case 32:
-        *(volatile uint32_t *) (fb->data + off)
+        *(volatile uint32_t *) (fb->bdata + off)
           = (red << 16) | (green << 8) | (blue);
         break;
 
       case 16:
-        *(volatile uint16_t *) (fb->data + off)
+        *(volatile uint16_t *) (fb->bdata + off)
 	  = ((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3);
         break;
       default:
@@ -320,21 +401,21 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
       {
       case 24:
 #if __BYTE_ORDER == __BIG_ENDIAN
-        *(fb->data + off + 0) = blue;
-        *(fb->data + off + 1) = green;
-        *(fb->data + off + 2) = red;
+        *(fb->bdata + off + 0) = blue;
+        *(fb->bdata + off + 1) = green;
+        *(fb->bdata + off + 2) = red;
 #else
-        *(fb->data + off + 0) = red;
-        *(fb->data + off + 1) = green;
-        *(fb->data + off + 2) = blue;
+        *(fb->bdata + off + 0) = red;
+        *(fb->bdata + off + 1) = green;
+        *(fb->bdata + off + 2) = blue;
 #endif
         break;
       case 32:
-        *(volatile uint32_t *) (fb->data + off)
+        *(volatile uint32_t *) (fb->bdata + off)
           = (blue << 16) | (green << 8) | (red);
         break;
       case 16:
-        *(volatile uint16_t *) (fb->data + off)
+        *(volatile uint16_t *) (fb->bdata + off)
 	  = ((blue >> 3) << 11) | ((green >> 2) << 5) | (red >> 3);
         break;
       default:
@@ -345,13 +426,13 @@ psplash_fb_plot_pixel (PSplashFB    *fb,
     switch (fb->bpp)
       {
       case 32:
-        *(volatile uint32_t *) (fb->data + off)
+        *(volatile uint32_t *) (fb->bdata + off)
 	  = ((red >> (8 - fb->red_length)) << fb->red_offset) 
 	      | ((green >> (8 - fb->green_length)) << fb->green_offset)
 	      | ((blue >> (8 - fb->blue_length)) << fb->blue_offset);
         break;
       case 16:
-        *(volatile uint16_t *) (fb->data + off)
+        *(volatile uint16_t *) (fb->bdata + off)
 	  = ((red >> (8 - fb->red_length)) << fb->red_offset) 
 	      | ((green >> (8 - fb->green_length)) << fb->green_offset)
 	      | ((blue >> (8 - fb->blue_length)) << fb->blue_offset);

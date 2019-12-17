@@ -124,6 +124,7 @@ parse_command (PSplashFB *fb, char *string)
       return 1;
     }
 
+  psplash_fb_flip(fb, 0);
   return 0;
 }
 
@@ -319,8 +320,15 @@ main (int argc, char** argv)
   psplash_draw_msg (fb, PSPLASH_STARTUP_MSG);
 #endif
 
-  psplash_main (fb, pipe_fd, 0);
+  /* Scene set so let's flip the buffers. */
+  /* The first time we also synchronize the buffers so we can build on an
+   * existing scene. After the first scene is set in both buffers, only the
+   * text and progress bar change which overwrite the specific areas with every
+   * update.
+   */
+  psplash_fb_flip(fb, 1);
 
+  psplash_main (fb, pipe_fd, 0);
 
   psplash_fb_destroy (fb);
 
