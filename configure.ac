@@ -23,6 +23,12 @@ AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemd" = "xyes"])
 
 AC_SUBST(GCC_FLAGS)
 
+AC_ARG_WITH([font],
+    AS_HELP_STRING([--with-font], [Set font to use (default is 'radeon')]),
+    [FONT_NAME=$withval],
+    [FONT_NAME=radeon])
+AC_SUBST([FONT_NAME])
+
 AC_OUTPUT([
 Makefile
 ])

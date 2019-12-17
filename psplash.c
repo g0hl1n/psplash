@@ -15,7 +15,7 @@
 #include "psplash-colors.h"
 #include "psplash-poky-img.h"
 #include "psplash-bar-img.h"
-#include "radeon-font.h"
+#include FONT_HEADER
 
 #define SPLIT_LINE_POS(fb)                                  \
 	(  (fb)->height                                     \
@@ -37,7 +37,7 @@ psplash_draw_msg (PSplashFB *fb, const char *msg)
 {
   int w, h;
 
-  psplash_fb_text_size (&w, &h, &radeon_font, msg);
+  psplash_fb_text_size (&w, &h, &FONT_DEF, msg);
 
   DBG("displaying '%s' %ix%i\n", msg, w, h);
 
@@ -54,7 +54,7 @@ psplash_draw_msg (PSplashFB *fb, const char *msg)
 			(fb->width-w)/2, 
 			SPLIT_LINE_POS(fb) - h,
 			PSPLASH_TEXT_COLOR,
-			&radeon_font,
+			&FONT_DEF,
 			msg);
 }
 

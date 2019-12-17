@@ -1,11 +1,11 @@
 bin_PROGRAMS=psplash psplash-write
 
-AM_CFLAGS = $(GCC_FLAGS) -D_GNU_SOURCE
+AM_CFLAGS = $(GCC_FLAGS) -D_GNU_SOURCE -DFONT_HEADER=\"$(FONT_NAME)-font.h\" -DFONT_DEF=$(FONT_NAME)_font
 
 psplash_SOURCES = psplash.c psplash.h psplash-fb.c psplash-fb.h \
                   psplash-console.c psplash-console.h           \
 		  psplash-colors.h psplash-config.h		\
-		  psplash-poky-img.h psplash-bar-img.h radeon-font.h
+		  psplash-poky-img.h psplash-bar-img.h $(FONT_NAME)-font.h
 
 psplash_write_SOURCES = psplash-write.c psplash.h
 
