@@ -29,6 +29,24 @@ AC_ARG_WITH([font],
     [FONT_NAME=radeon])
 AC_SUBST([FONT_NAME])
 
+AC_ARG_ENABLE([startup-msg],
+    AS_HELP_STRING([--disable-startup-msg], [Disable text banner output on startup]),
+    [disable_startup_msg=true],
+    [disable_startup_msg=false])
+AS_IF([test x$disable_startup_msg = xtrue], [
+    EXTRA_GCC_FLAGS="$EXTRA_GCC_FLAGS -DPSPLASH_DISABLE_STARTUP_MSG"
+])
+
+AC_ARG_ENABLE([img-fullscreen],
+    AS_HELP_STRING([--enable-img-fullscreen], [Enable the logo image in fullscreen mode)]),
+    [img_fullscreen=true],
+    [img_fullscreen=false])
+AS_IF([test x$img_fullscreen = xtrue], [
+    EXTRA_GCC_FLAGS="$EXTRA_GCC_FLAGS -DPSPLASH_IMG_FULLSCREEN=1"
+])
+
+AC_SUBST(EXTRA_GCC_FLAGS)
+
 AC_OUTPUT([
 Makefile
 ])
