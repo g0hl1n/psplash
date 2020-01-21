@@ -9,6 +9,13 @@ psplash_SOURCES = psplash.c psplash.h psplash-fb.c psplash-fb.h \
 
 psplash_write_SOURCES = psplash-write.c psplash.h
 
+if HAVE_SYSTEMD
+bin_PROGRAMS += psplash-systemd
+psplash_systemd_CPPFLAGS = $(SYSTEMD_CFLAGS)
+psplash_systemd_LDFLAGS= $(SYSTEMD_LIBS)
+psplash_systemd_SOURCES = psplash-systemd.c psplash.h
+endif
+
 EXTRA_DIST = make-image-header.sh
  
 MAINTAINERCLEANFILES = aclocal.m4 compile config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing

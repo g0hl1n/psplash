@@ -12,6 +12,15 @@ if test "x$GCC" = "xyes"; then
         GCC_FLAGS="-g -Wall -Wextra"
 fi
 
+AC_ARG_WITH([systemd], AS_HELP_STRING([--with-systemd], [Build with systemd
+	     support]))
+
+AS_IF([test "x$with_systemd" = "xyes"], [
+   PKG_CHECK_MODULES(SYSTEMD, libsystemd >= 221)
+])
+
+AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemd" = "xyes"])
+
 AC_SUBST(GCC_FLAGS)
 
 AC_OUTPUT([
