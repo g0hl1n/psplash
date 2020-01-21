@@ -6,7 +6,7 @@ psplash_SOURCES = psplash.c psplash.h psplash-fb.c psplash-fb.h \
                   psplash-console.c psplash-console.h           \
 		  psplash-colors.h psplash-config.h		\
 		  psplash-poky-img.h psplash-bar-img.h $(FONT_NAME)-font.h
-BUILD_SOURCES = psplash-poky-img.h psplash-bar-img.h
+BUILT_SOURCES = psplash-poky-img.h psplash-bar-img.h
 
 psplash_write_SOURCES = psplash-write.c psplash.h
 
