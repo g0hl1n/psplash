@@ -25,7 +25,7 @@ snapshot:
 	$(MAKE) dist distdir=$(PACKAGE)-snap`date +"%Y%m%d"`
 
 psplash-bar-img.h: base-images/psplash-bar.png
-	./make-image-header.sh $< BAR
+	$(top_srcdir)/make-image-header.sh $< BAR
 psplash-poky-img.h: base-images/psplash-poky.png
-	./make-image-header.sh $< POKY
+	$(top_srcdir)/make-image-header.sh $< POKY
 
