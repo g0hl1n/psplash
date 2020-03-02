@@ -15,6 +15,9 @@
 #include "psplash-colors.h"
 #include "psplash-poky-img.h"
 #include "psplash-bar-img.h"
+#ifdef HAVE_SYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
 #include FONT_HEADER
 
 #define SPLIT_LINE_POS(fb)                                  \
@@ -284,6 +287,10 @@ main (int argc, char** argv)
 	  ret = -1;
 	  goto fb_fail;
     }
+
+#ifdef HAVE_SYSTEMD
+  sd_notify(0, "READY=1");
+#endif
 
   /* Clear the background with #ecece1 */
   psplash_fb_draw_rect (fb, 0, 0, fb->width, fb->height,

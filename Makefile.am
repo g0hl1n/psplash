@@ -11,6 +11,8 @@ BUILT_SOURCES = psplash-poky-img.h psplash-bar-img.h
 psplash_write_SOURCES = psplash-write.c psplash.h
 
 if HAVE_SYSTEMD
+psplash_CPPFLAGS = $(SYSTEMD_CFLAGS) -DHAVE_SYSTEMD
+psplash_LDFLAGS= $(SYSTEMD_LIBS)
 bin_PROGRAMS += psplash-systemd
 psplash_systemd_CPPFLAGS = $(SYSTEMD_CFLAGS)
 psplash_systemd_LDFLAGS= $(SYSTEMD_LIBS)
