@@ -21,6 +21,11 @@
 #define PSPLASH_IMG_FULLSCREEN 0
 #endif
 
+/* Bool indicated if the progress bar should be disabled */
+#ifndef PSPLASH_DISABLE_PROGRESS_BAR
+#define PSPLASH_SHOW_PROGRESS_BAR 1
+#endif
+
 /* Position of the image split from top edge, numerator of fraction */
 #define PSPLASH_IMG_SPLIT_NUMERATOR 5
 

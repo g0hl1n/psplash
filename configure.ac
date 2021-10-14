@@ -37,6 +37,14 @@ AS_IF([test x$disable_startup_msg = xtrue], [
     EXTRA_GCC_FLAGS="$EXTRA_GCC_FLAGS -DPSPLASH_DISABLE_STARTUP_MSG"
 ])
 
+AC_ARG_ENABLE([progress-bar],
+    AS_HELP_STRING([--disable-progress-bar], [Disable progress bar]),
+    [disable_progress_bar=true],
+    [disable_progress_bar=false])
+AS_IF([test x$disable_progress_bar = xtrue], [
+    EXTRA_GCC_FLAGS="$EXTRA_GCC_FLAGS -DPSPLASH_DISABLE_PROGRESS_BAR"
+])
+
 AC_ARG_ENABLE([img-fullscreen],
     AS_HELP_STRING([--enable-img-fullscreen], [Enable the logo image in fullscreen mode)]),
     [img_fullscreen=true],
