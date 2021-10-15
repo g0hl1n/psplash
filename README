@@ -19,10 +19,10 @@ Please refer to
 for some useful guidelines to be followed when submitting patches.
 
 Mailing list:
-    https://lists.yoctoproject.org/listinfo/yocto
+    https://lists.yoctoproject.org/g/yocto
 
 When creating patches, please use something like:
     git format-patch -M -s --subject-prefix='psplash][PATCH' origin
 
 When sending patches, please use something like:
-    git send-email --to yocto@yoctoproject.org <generated patch>
+    git send-email --to yocto@lists.yoctoproject.org <generated patch>
