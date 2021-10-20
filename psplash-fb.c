@@ -197,7 +197,8 @@ psplash_fb_new (int angle, int fbdev_id)
 
   /* Setup double virtual resolution for double buffering */
   if (ioctl(fb->fd, FBIOPAN_DISPLAY, &fb_var) == -1) {
-    fprintf(stderr, "FBIOPAN_DISPLAY not supported, double buffering disabled");
+    fprintf(stderr, "warning: FBIOPAN_DISPLAY not supported, "
+                    "double buffering disabled\n");
   } else {
     if (fb_var.yres_virtual == fb_var.yres * 2) {
       DBG("Virtual resolution already double");
@@ -205,7 +206,8 @@ psplash_fb_new (int angle, int fbdev_id)
     } else {
       fb_var.yres_virtual = fb_var.yres * 2;
       if (ioctl(fb->fd, FBIOPUT_VSCREENINFO, &fb_var) == -1) {
-        fprintf(stderr, "FBIOPUT_VSCREENINFO failed, double buffering disabled");
+        fprintf(stderr, "warning: FBIOPUT_VSCREENINFO failed, "
+                        "double buffering disabled\n");
       } else {
         if (ioctl(fb->fd, FBIOGET_FSCREENINFO, &fb_fix) == -1) {
           perror(" Error getting the fixed framebuffer info");
